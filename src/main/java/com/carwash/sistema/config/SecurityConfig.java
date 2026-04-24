@@ -19,7 +19,23 @@ public class SecurityConfig {
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/login", "/css/**", "/js/**", "/images/**",
                                  "/imagenes/**", "/webjars/**").permitAll()
-                .requestMatchers("/usuarios/**", "/reportes/**").hasAuthority("ADMIN")
+
+                // Solo ADMIN puede gestionar usuarios y reportes
+                .requestMatchers("/usuarios/**").hasAuthority("ADMIN")
+                .requestMatchers("/reportes/**").hasAnyAuthority("ADMIN", "CAJERO")
+
+                // VISUALIZADOR solo puede ver — bloquear rutas de modificación
+                .requestMatchers(
+                    "/ordenes/guardar", "/ordenes/*/eliminar", "/ordenes/*/cambiar-estado",
+                    "/ventas/guardar", "/ventas/*/eliminar",
+                    "/productos/guardar", "/productos/*/eliminar",
+                    "/clientes/guardar", "/clientes/*/eliminar",
+                    "/vehiculos/guardar", "/vehiculos/*/eliminar",
+                    "/servicios/guardar", "/servicios/*/eliminar",
+                    "/categorias/guardar", "/categorias/*/eliminar",
+                    "/configuracion/**", "/sunat/emitir"
+                ).hasAnyAuthority("ADMIN", "CAJERO", "LAVADOR")
+
                 .anyRequest().authenticated()
             )
             .formLogin(login -> login
@@ -36,7 +52,7 @@ public class SecurityConfig {
                 .sessionFixation().migrateSession()
                 .maximumSessions(-1)
             );
-        
+
         return http.build();
     }
 

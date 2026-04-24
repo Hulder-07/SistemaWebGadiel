@@ -29,6 +29,7 @@ public class DataInitializer implements CommandLineRunner {
         Rol admin   = crearRol("ADMIN");
         Rol cajero  = crearRol("CAJERO");
         Rol lavador = crearRol("LAVADOR");
+        Rol visualizador = crearRol("VISUALIZADOR");
 
         // ── Usuarios ───────────────────────────────────────────
         if (usuarioRepository.findByUsername("admin").isEmpty()) {
@@ -53,6 +54,14 @@ public class DataInitializer implements CommandLineRunner {
             u.setPassword(passwordEncoder.encode("lavador123"));
             u.setNombre("Lavador");
             u.setRoles(Set.of(lavador));
+            usuarioRepository.save(u);
+        }
+        if (usuarioRepository.findByUsername("demo").isEmpty()) {
+            Usuario u = new Usuario();
+            u.setUsername("demo");
+            u.setPassword(passwordEncoder.encode("demo123"));
+            u.setNombre("Usuario Demo");
+            u.setRoles(Set.of(visualizador));
             usuarioRepository.save(u);
         }
 

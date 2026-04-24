@@ -419,6 +419,20 @@
       .page-body { padding: 18px 14px; }
     }
   </style>
+
+  <!-- Oculta botones de acción para VISUALIZADOR -->
+  <style th:if="${#authorization.expression('hasAuthority(''VISUALIZADOR'')')}">
+    .btn-primary,
+    a[href*='/nuevo'],
+    a[href*='/guardar'],
+    a[href*='/eliminar'],
+    a[href*='/editar'],
+    button[type='submit'],
+    .btn-agregar,
+    .btn-registrar,
+    .btn-vender,
+    form { display: none !important; }
+  </style>
 </head>
 <body>
 
