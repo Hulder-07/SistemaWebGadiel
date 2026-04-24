@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Caja & Órdenes</title></head>
+<body>
+<div layout:fragment="page-title">Caja & órdenes de Servicio</div>
+<div layout:fragment="content">
+
+<style>
+/* ── STATS CARDS ─────────────────────────────────────── */
+.caja-stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  margin-bottom: 20px;
+}
+@media(max-width:1100px){ .caja-stats{ grid-template-columns: repeat(2,1fr); } }
+@media(max-width:600px){  .caja-stats{ grid-template-columns: 1fr; } }
+
+.stat-card {
+  background: var(--bg-card);
+  border-radius: var(--radius);
+  padding: 18px 20px;
+  display: flex; align-items: center; gap: 14px;
+  border: 1px solid var(--border);
+  box-shadow: var(--shadow);
+  transition: transform var(--transition);
+}
+.stat-card:hover { transform: translateY(-2px); }
+.stat-ico {
+  width: 46px; height: 46px; border-radius: 12px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.ico-green  { background: rgba(22,163,74,.12);  color: #16a34a; }
+.ico-purple { background: rgba(109,40,217,.12); color: #6d28d9; }
+.ico-blue   { background: rgba(29,111,184,.12); color: #1d6fb8; }
+.ico-red    { background: var(--accent-glow);   color: var(--accent); }
+
+.stat-lbl { font-size: 10.5px; font-weight: 700; color: var(--text-3); text-transform: uppercase; letter-spacing: .8px; }
+.stat-val { font-size: 20px; font-weight: 800; color: var(--text-1); font-family: var(--font-display); margin-top: 2px; }
+
+/* ── CAJA INFO BAR ───────────────────────────────────── */
+.caja-infobar {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  padding: 12px 20px;
+  display: flex; align-items: center; gap: 20px;
+  margin-bottom: 20px; flex-wrap: wrap;
+  font-size: 12.5px; color: var(--text-2);
+}
+.caja-infobar .tag {
+  display: flex; align-items: center; gap: 6px; font-weight: 500;
+}
+.caja-infobar .tag i { color: var(--accent); }
+.caja-open-dot {
+  width: 8px; height: 8px; border-radius: 50%;
+  background: var(--green);
+  box-shadow: 0 0 6px var(--green-glow);
+  animation: blink 2s infinite;
+  flex-shrink: 0;
+}
+
+/* ── NO CAJA BANNER ──────────────────────────────────── */
+.no-caja-banner {
+  background: linear-gradient(135deg, #fff8f0, #fff3e0);
+  border: 1px solid rgba(180,83,9,.25);
+  border-radius: var(--radius);
+  padding: 32px; text-align: center; margin-bottom: 20px;
+}
+.no-caja-banner i { font-size: 36px; color: var(--yellow); margin-bottom: 10px; display: block; }
+.no-caja-banner h3 { font-family: var(--font-display); font-size: 16px; margin-bottom: 6px; }
+.no-caja-banner p  { color: var(--text-2); font-size: 13px; }
+
+/* ── ACTION BUTTONS ──────────────────────────────────── */
+.action-row {
+  display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;
+}
+.action-row .btn { padding: 9px 18px; font-size: 13px; display: flex; align-items: center; gap: 7px; }
+
+/* ── TABS ────────────────────────────────────────────── */
+.tabs-bar {
+  display: flex; gap: 6px; margin-bottom: 16px; flex-wrap: wrap; align-items: center;
+}
+.tab-pill {
+  padding: 7px 15px; border-radius: 100px;
+  font-size: 12.5px; font-weight: 600;
+  border: 1.5px solid var(--border);
+  background: var(--bg-card); color: var(--text-2);
+  cursor: pointer; transition: all var(--transition);
+  display: flex; align-items: center; gap: 6px;
+  text-decoration: none;
+}
+.tab-pill:hover { border-color: var(--accent); color: var(--accent); background: var(--accent-light); }
+.tab-pill.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+.tab-pill .cnt {
+  background: rgba(255,255,255,.3); color: inherit;
+  border-radius: 100px; padding: 1px 7px; font-size: 10px; font-weight: 800;
+}
+.tab-pill.active .cnt { background: rgba(255,255,255,.25); }
+
+/* ── SEARCH ──────────────────────────────────────────── */
+.search-wrap { position: relative; margin-left: auto; }
+.search-wrap i {
+  position: absolute; left: 10px; top: 50%;
+  transform: translateY(-50%); color: var(--text-3); font-size: 12px;
+}
+.search-wrap input {
+  padding: 7px 12px 7px 30px; font-size: 12.5px;
+  border-radius: 100px; width: 210px;
+}
+
+/* ── UNIFIED TABLE ───────────────────────────────────── */
+.unified-card {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  overflow: hidden; margin-bottom: 20px;
+  box-shadow: var(--shadow);
+}
+.unified-card .card-header {
+  padding: 14px 20px;
+  display: flex; align-items: center; justify-content: space-between;
+  border-bottom: 1px solid var(--border); flex-wrap: wrap; gap: 8px;
+}
+.card-title { display: flex; align-items: center; gap: 8px; font-weight: 700; font-size: 14px; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); flex-shrink: 0; }
+.cnt-label { font-size: 11.5px; color: var(--text-3); font-family: var(--font-mono); }
+
+.unified-card table td .placa-big  { font-weight: 700; font-size: 13.5px; }
+.unified-card table td .sub-txt    { font-size: 11px; color: var(--text-3); margin-top: 1px; }
+.monto-cell { font-weight: 700; color: var(--accent); }
+
+.pay-badge {
+  display: inline-flex; align-items: center; gap: 5px;
+  padding: 3px 10px; border-radius: 100px; font-size: 11px; font-weight: 600;
+}
+.pay-efectivo { background: rgba(22,163,74,.12);  color: #16a34a; }
+.pay-yape     { background: rgba(109,40,217,.12); color: #6d28d9; }
+.pay-tarjeta  { background: rgba(29,111,184,.12); color: #1d6fb8; }
+
+
+/* ── SECTION DIVIDER ─────────────────────────────────── */
+.section-divider {
+  display: flex; align-items: center; gap: 12px;
+  margin: 24px 0 16px; font-size: 11px; font-weight: 700;
+  color: var(--text-3); text-transform: uppercase; letter-spacing: 1px;
+}
+.section-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border);
+}
+</style>
+
+<!-- ── ALERTS ───────────────────────────────────────────────── -->
+<div th:if="${msg}"     class="alert-box success" th:text="${msg}"></div>
+<div th:if="${error}"   class="alert-box danger"  th:text="${error}"></div>
+<div th:if="${success}" class="alert-box success" th:text="${success}"></div>
+<div th:if="${warning}" class="alert-box warning" th:text="${warning}"></div>
+<div th:if="${param.error}" class="alert-box danger" th:text="${param.error}"></div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BLOQUE A: SIN CAJA ABIERTA
+════════════════════════════════════════════════════════════ -->
+<div th:if="${!hayCajaAbierta}">
+  <div class="no-caja-banner">
+    <i class="fa-solid fa-cash-register"></i>
+    <h3>No hay caja abierta</h3>
+    <p>Para registrar lavados y gestionar el día, primero abre la caja.</p>
+    <a th:href="@{/caja-lavadero/abrir}" class="btn btn-primary" style="margin-top:14px;display:inline-flex;gap:8px;align-items:center;">
+      <i class="fa-solid fa-lock-open"></i> Abrir Caja
+    </a>
+  </div>
+
+  <!-- Igual mostramos órdenes aunque no haya caja -->
+  <div class="section-divider">Órdenes del sistema</div>
+</div>
+
+<!-- ════════════════════════════════════════════════════════════
+     BLOQUE B: CON CAJA ABIERTA
+════════════════════════════════════════════════════════════ -->
+<div th:if="${hayCajaAbierta}">
+
+  <!-- Info bar -->
+  <div class="caja-infobar">
+    <span class="caja-open-dot"></span>
+    <span class="tag"><i class="fa-solid fa-calendar-day"></i>
+      <span th:text="${#temporals.format(#temporals.createNow(), 'dd/MM/yyyy')}"></span>
+    </span>
+    <span class="tag"><i class="fa-solid fa-user"></i>
+      <span th:text="${cajaAbierta.responsable.nombre}"></span>
+    </span>
+    <span class="tag"><i class="fa-solid fa-clock"></i>
+      Apertura: <strong th:text="${#temporals.format(cajaAbierta.fechaApertura, 'HH:mm')}"></strong>
+    </span>
+    <span class="tag"><i class="fa-solid fa-car"></i>
+      <strong th:text="${cajaAbierta.cantidadVehiculos}">0</strong>&nbsp;vehículo(s) hoy
+    </span>
+  </div>
+
+  <!-- Stats cards -->
+  <div class="caja-stats">
+    <div class="stat-card">
+      <div class="stat-ico ico-green"><i class="fa-solid fa-money-bill-wave"></i></div>
+      <div>
+        <div class="stat-lbl">Efectivo</div>
+        <div class="stat-val">S/ <span th:text="${#numbers.formatDecimal(cajaAbierta.totalEfectivo,1,'COMMA',2,'POINT')}">0.00</span></div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-ico ico-purple"><i class="fa-solid fa-mobile-screen"></i></div>
+      <div>
+        <div class="stat-lbl">Yape</div>
+        <div class="stat-val">S/ <span th:text="${#numbers.formatDecimal(cajaAbierta.totalYape,1,'COMMA',2,'POINT')}">0.00</span></div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-ico ico-blue"><i class="fa-solid fa-credit-card"></i></div>
+      <div>
+        <div class="stat-lbl">Tarjeta</div>
+        <div class="stat-val">S/ <span th:text="${#numbers.formatDecimal(cajaAbierta.totalTarjeta,1,'COMMA',2,'POINT')}">0.00</span></div>
+      </div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-ico ico-red"><i class="fa-solid fa-sack-dollar"></i></div>
+      <div>
+        <div class="stat-lbl">Total del Día</div>
+        <div class="stat-val">S/ <span th:text="${#numbers.formatDecimal(cajaAbierta.totalDia,1,'COMMA',2,'POINT')}">0.00</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Action buttons -->
+  <div class="action-row">
+    <a th:href="@{/caja-lavadero/registrar}" class="btn btn-primary">
+      <i class="fa-solid fa-plus"></i> Registrar Vehículo
+    </a>
+    <a th:href="@{/ordenes/nueva}" class="btn btn-outline">
+      <i class="fa-solid fa-file-circle-plus"></i> Nueva Orden
+    </a>
+    <a th:href="@{/caja-lavadero/reportes}" class="btn btn-outline">
+      <i class="fa-solid fa-chart-bar"></i> Reportes
+    </a>
+    <a th:href="@{/caja-lavadero/cerrar}" class="btn btn-outline"
+       style="margin-left:auto;"
+       onclick="return confirm('¿Cerrar la caja del día?')">
+      <i class="fa-solid fa-lock"></i> Cerrar Caja
+    </a>
+    <button onclick="location.reload()" class="btn btn-outline">
+      <i class="fa-solid fa-rotate-right"></i> Actualizar
+    </button>
+  </div>
+
+</div><!-- /hayCajaAbierta -->
+
+<!-- ════════════════════════════════════════════════════════════
+     TABLA UNIFICADA: Lavados de hoy + Órdenes
+════════════════════════════════════════════════════════════ -->
+
+<!-- PESTAÑAS + BUSCADOR -->
+<div class="tabs-bar">
+  <!-- Tab: Lavados hoy (solo si hay caja) -->
+  <a th:if="${hayCajaAbierta}"
+     href="#" class="tab-pill" id="tab-lavados" onclick="switchTab('lavados',this);return false;">
+    <i class="fa-solid fa-car-side"></i> Lavados de hoy
+    <span class="cnt" th:text="${cajaAbierta != null ? cajaAbierta.cantidadVehiculos : 0}">0</span>
+  </a>
+
+  <!-- Tab: Órdenes -->
+  <a href="#" class="tab-pill active" id="tab-ordenes" onclick="switchTab('ordenes',this);return false;">
+    <i class="fa-solid fa-soap"></i> Órdenes de Servicio
+    <span class="cnt" id="cntOrdenesTab" th:text="${#lists.size(ordenes)}">0</span>
+  </a>
+
+  <!-- FILTROS DE ESTADO - RUTAS CORREGIDAS -->
+  <div id="filtros-ordenes" style="display:flex;gap:6px;flex-wrap:wrap;">
+    <a th:href="@{/caja-lavadero/caja-ordenes}" class="tab-pill" th:classappend="${estadoFiltro==null}?' active':''">
+      <i class="fa-solid fa-border-all"></i> Todas
+    </a>
+    <a th:href="@{/caja-lavadero/caja-ordenes(estado='PENDIENTE')}" class="tab-pill" th:classappend="${estadoFiltro=='PENDIENTE'}?' active':''">
+      <i class="fa-solid fa-clock"></i> Pendientes
+      <span class="cnt" th:if="${pendientes>0}" th:text="${pendientes}"></span>
+    </a>
+    <a th:href="@{/caja-lavadero/caja-ordenes(estado='EN_PROCESO')}" class="tab-pill" th:classappend="${estadoFiltro=='EN_PROCESO'}?' active':''">
+      <i class="fa-solid fa-spinner"></i> En Proceso
+      <span class="cnt" th:if="${enProceso>0}" th:text="${enProceso}"></span>
+    </a>
+    <a th:href="@{/caja-lavadero/caja-ordenes(estado='COMPLETADO')}" class="tab-pill" th:classappend="${estadoFiltro=='COMPLETADO'}?' active':''">
+      <i class="fa-solid fa-check"></i> Completados
+    </a>
+    <a th:href="@{/caja-lavadero/caja-ordenes(estado='CANCELADO')}" class="tab-pill" th:classappend="${estadoFiltro=='CANCELADO'}?' active':''">
+      <i class="fa-solid fa-xmark"></i> Cancelados
+    </a>
+  </div>
+
+  <div class="search-wrap">
+    <i class="fa-solid fa-magnifying-glass"></i>
+    <input type="text" id="buscarInput" class="form-control"
+           placeholder="Buscar placa, orden, cliente…" oninput="buscar(this.value)"/>
+  </div>
+</div>
+
+<!-- ── PANEL LAVADOS HOY ─────────────────────────────────────── -->
+<div id="panel-lavados" style="display:none;" th:if="${hayCajaAbierta}">
+  <div class="unified-card">
+    <div class="card-header">
+      <div class="card-title"><div class="dot"></div> Vehículos Atendidos Hoy</div>
+      <span class="cnt-label" th:text="${cajaAbierta.cantidadVehiculos}+' vehículo(s)'"></span>
+    </div>
+
+    <div th:if="${registros != null and !registros.empty}">
+      <table id="tablaLavados">
+        <thead>
+          <tr>
+            <th>N°</th><th>Tipo / Placa</th><th>Servicio</th>
+            <th>Monto</th><th>Pago</th><th>Hora</th><th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr th:each="r : ${registros}"
+              th:attr="data-busca=${#strings.toLowerCase((r.placa!=null?r.placa:'')+' '+r.servicioCompleto)}">
+            <td><span class="mono" th:text="${r.numeroOrden}">1</span></td>
+            <td>
+              <div class="placa-big" th:text="${r.placa!=null?r.placa:'-'}">ABC-123</div>
+              <div class="sub-txt">
+                <span th:text="${r.iconoVehiculo}">🚗</span>
+                <span th:text="${r.tipoVehiculo}">Auto</span>
+              </div>
+            </td>
+            <td th:text="${r.servicioCompleto}">Lavado</td>
+            <td class="monto-cell">S/ <span th:text="${#numbers.formatDecimal(r.monto,1,'COMMA',2,'POINT')}">0.00</span></td>
+            <td>
+              <span class="pay-badge"
+                    th:classappend="${r.metodoPago=='EFECTIVO'}?'pay-efectivo':(${r.metodoPago=='YAPE'}?'pay-yape':'pay-tarjeta')">
+                <span th:text="${r.iconoMetodoPago}">💵</span>
+                <span th:text="${r.metodoPago}">Efectivo</span>
+              </span>
+            </td>
+            <td class="mono" th:text="${#temporals.format(r.fechaRegistro,'HH:mm')}">10:30</td>
+            <td>
+              <div style="display:flex;gap:6px;">
+                <a th:href="@{/caja-lavadero/editar/{id}(id=${r.id})}" class="btn btn-sm btn-outline" title="Editar">
+                  <i class="fa-solid fa-pen"></i>
+                </a>
+                <button class="btn btn-sm btn-outline" title="Eliminar"
+                        th:onclick="'eliminarRegistro('+${r.id}+')'">
+                  <i class="fa-solid fa-trash" style="color:var(--accent);"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          <tr id="sinLavado" style="display:none;">
+            <td colspan="7" style="text-align:center;padding:28px;color:var(--text-3);">
+              <i class="fa-solid fa-magnifying-glass" style="font-size:20px;display:block;margin-bottom:8px;opacity:.4;"></i>
+              Sin resultados
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div th:if="${registros==null or registros.empty}"
+         style="text-align:center;padding:48px;color:var(--text-3);">
+      <i class="fa-solid fa-inbox" style="font-size:32px;display:block;margin-bottom:10px;opacity:.3;"></i>
+      Aún no hay vehículos registrados hoy
+    </div>
+  </div>
+</div>
+
+<!-- ── PANEL ÓRDENES ─────────────────────────────────────────── -->
+<div id="panel-ordenes">
+  <div class="unified-card">
+    <div class="card-header">
+      <div class="card-title"><div class="dot"></div> Listado de Órdenes</div>
+      <span class="cnt-label" id="cntOrdenes"></span>
+    </div>
+    <table id="tablaOrdenes">
+      <thead>
+        <tr>
+          <th>N° Orden</th><th>Placa / Vehículo</th><th>Cliente</th>
+          <th>Servicio</th><th>Estado</th><th>Total</th><th>Fecha</th><th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr th:each="o : ${ordenes}"
+            th:attr="data-busca=${#strings.toLowerCase(o.numeroOrden+' '+o.vehiculo.placa+' '+(o.vehiculo.cliente!=null?o.vehiculo.cliente.nombre:''))}">
+          <td><span class="mono" th:text="${o.numeroOrden}"></span></td>
+          <td>
+            <div class="placa-big" th:text="${o.vehiculo.placa}"></div>
+            <div class="sub-txt" th:text="${o.vehiculo.marca+' '+o.vehiculo.modelo}"></div>
+          </td>
+          <td th:text="${o.vehiculo.cliente!=null?o.vehiculo.cliente.nombre:'-'}"></td>
+          <td>
+            <div th:text="${o.servicio.nombre}"></div>
+            <div class="sub-txt" th:text="${o.servicio.categoria}"></div>
+          </td>
+          <td>
+            <span class="pill"
+                  th:classappend="${o.estado=='COMPLETADO'}?'pill-active':
+                                  (${o.estado=='EN_PROCESO'}?'pill-info':
+                                  (${o.estado=='CANCELADO'}?'pill-critical':'pill-low'))"
+                  th:text="${o.estado}"></span>
+          </td>
+          <td class="monto-cell" th:text="'S/ '+${#numbers.formatDecimal(o.total,1,'COMMA',2,'POINT')}"></td>
+          <td class="mono" style="font-size:12px;" th:text="${#temporals.format(o.fechaInicio,'dd/MM/yy HH:mm')}"></td>
+          <td>
+            <div style="display:flex;gap:6px;">
+              <a th:href="@{/ordenes/{id}/detalle(id=${o.id})}" class="btn btn-sm btn-outline" title="Ver">
+                <i class="fa-solid fa-eye"></i>
+              </a>
+              <a th:href="@{/ordenes/{id}/pdf(id=${o.id})}" class="btn btn-sm btn-outline" title="PDF">
+                <i class="fa-solid fa-file-pdf" style="color:var(--accent);"></i>
+              </a>
+              <a th:href="@{/ordenes/{id}/eliminar(id=${o.id})}" class="btn btn-sm btn-outline"
+                 onclick="return confirm('¿Eliminar esta orden?')" title="Eliminar">
+                <i class="fa-solid fa-trash" style="color:var(--accent);"></i>
+              </a>
+            </div>
+          </td>
+        </tr>
+        <tr id="sinOrden" style="display:none;">
+          <td colspan="8" style="text-align:center;padding:28px;color:var(--text-3);">
+            <i class="fa-solid fa-magnifying-glass" style="font-size:20px;display:block;margin-bottom:8px;opacity:.4;"></i>
+            No se encontraron órdenes
+          </td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(ordenes)}">
+          <td colspan="8" style="text-align:center;padding:48px;color:var(--text-3);">
+            <i class="fa-solid fa-inbox" style="font-size:32px;display:block;margin-bottom:10px;opacity:.3;"></i>
+            No hay órdenes registradas
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+
+
+</th:block>
+
+<!-- ── SCRIPTS ───────────────────────────────────────────────── -->
+<th:block layout:fragment="scripts">
+<script>
+/* ── TABS ──────────────────────────────────────────────────── */
+const hayCaja = /*[[${hayCajaAbierta}]]*/ false;
+
+function switchTab(tab, btn) {
+  document.querySelectorAll('.tab-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+
+  const panelLavados = document.getElementById('panel-lavados');
+  const panelOrdenes = document.getElementById('panel-ordenes');
+  const filtrosOrdenes = document.getElementById('filtros-ordenes');
+
+  if (tab === 'lavados') {
+    if (panelLavados) panelLavados.style.display = '';
+    panelOrdenes.style.display = 'none';
+    if (filtrosOrdenes) filtrosOrdenes.style.display = 'none';
+  } else {
+    if (panelLavados) panelLavados.style.display = 'none';
+    panelOrdenes.style.display = '';
+    if (filtrosOrdenes) filtrosOrdenes.style.display = 'flex';
+    buscar('');
+  }
+  document.getElementById('buscarInput').value = '';
+}
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (hayCaja) {
+    const tabLavados = document.getElementById('tab-lavados');
+    const tabOrdenes = document.getElementById('tab-ordenes');
+    if (tabLavados) {
+      tabLavados.classList.add('active');
+      tabOrdenes.classList.remove('active');
+      document.getElementById('panel-lavados').style.display = '';
+      document.getElementById('panel-ordenes').style.display = 'none';
+      document.getElementById('filtros-ordenes').style.display = 'none';
+    }
+  } else {
+    buscar('');
+  }
+});
+
+function buscar(q) {
+  q = q.toLowerCase().trim();
+
+  const filaLav = document.querySelectorAll('#tablaLavados tbody tr[data-busca]');
+  let visL = 0;
+  filaLav.forEach(tr => {
+    const ok = !q || tr.dataset.busca.includes(q);
+    tr.style.display = ok ? '' : 'none';
+    if (ok) visL++;
+  });
+  const sinLav = document.getElementById('sinLavado');
+  if (sinLav) sinLav.style.display = visL === 0 && q ? '' : 'none';
+
+  const filaOrd = document.querySelectorAll('#tablaOrdenes tbody tr[data-busca]');
+  let visO = 0;
+  filaOrd.forEach(tr => {
+    const ok = !q || tr.dataset.busca.includes(q);
+    tr.style.display = ok ? '' : 'none';
+    if (ok) visO++;
+  });
+  const sinOrd = document.getElementById('sinOrden');
+  if (sinOrd) sinOrd.style.display = visO === 0 && q ? '' : 'none';
+
+  const cnt = document.getElementById('cntOrdenes');
+  if (cnt) cnt.textContent = visO + ' orden(es)';
+}
+
+function eliminarRegistro(id) {
+  if (!confirm('¿Eliminar este registro?')) return;
+  fetch('/caja-lavadero/registro/' + id, {
+    method: 'DELETE',
+    headers: { 'Content-Type': 'application/json' }
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) { alert('✅ ' + d.message); location.reload(); }
+    else alert('❌ ' + d.message);
+  })
+  .catch(e => alert('❌ Error: ' + e));
+}
+
+setInterval(() => location.reload(), 30000);
+</script>
+</th:block>
+</body>
+</html>

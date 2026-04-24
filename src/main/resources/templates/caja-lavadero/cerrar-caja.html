@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Cerrar Caja</title>
+    <style>
+        .form-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-header i {
+            font-size: 4rem;
+            color: #dc3545;
+            margin-bottom: 1rem;
+        }
+
+        .resumen-caja {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .resumen-row {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.75rem 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .resumen-row:last-child {
+            border-bottom: none;
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #dc3545;
+        }
+
+        .resumen-label {
+            font-weight: 600;
+        }
+
+        .resumen-value {
+            font-size: 1.125rem;
+        }
+
+        .arqueo-section {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .diferencia-display {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-top: 1rem;
+            text-align: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+        }
+
+        .diferencia-display.positiva {
+            border-color: #28a745;
+            color: #28a745;
+            background: #d4edda;
+        }
+
+        .diferencia-display.negativa {
+            border-color: #dc3545;
+            color: #dc3545;
+            background: #f8d7da;
+        }
+
+        .diferencia-display.cero {
+            border-color: #007bff;
+            color: #007bff;
+            background: #e7f3ff;
+        }
+
+        .warning-box {
+            background: #fff3cd;
+            border: 1px solid #ffc107;
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .warning-box i {
+            color: #ffc107;
+            margin-right: 0.5rem;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-box {
+            background: white;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        .stat-icon {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-label {
+            font-size: 0.875rem;
+            color: #6c757d;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-value {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #212529;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <i class="fas fa-lock"></i>
+                <h2>Cerrar Caja del Día</h2>
+                <p class="text-muted">
+                    <i class="fas fa-calendar"></i> 
+                    <span th:text="${#temporals.format(caja.fechaApertura, 'dd/MM/yyyy')}"></span>
+                    | ⏰ Apertura: <span th:text="${#temporals.format(caja.fechaApertura, 'HH:mm')}"></span>
+                </p>
+            </div>
+
+            <!-- Resumen del día -->
+            <div class="resumen-caja">
+                <h4 class="mb-3">📊 Resumen del Día</h4>
+                
+                <div class="stats-grid">
+                    <div class="stat-box">
+                        <div class="stat-icon">💵</div>
+                        <div class="stat-label">Efectivo</div>
+                        <div class="stat-value">S/ <span th:text="${#numbers.formatDecimal(caja.totalEfectivo, 1, 2)}">0.00</span></div>
+                    </div>
+                    
+                    <div class="stat-box">
+                        <div class="stat-icon">📱</div>
+                        <div class="stat-label">Yape</div>
+                        <div class="stat-value">S/ <span th:text="${#numbers.formatDecimal(caja.totalYape, 1, 2)}">0.00</span></div>
+                    </div>
+                    
+                    <div class="stat-box">
+                        <div class="stat-icon">💳</div>
+                        <div class="stat-label">Tarjeta</div>
+                        <div class="stat-value">S/ <span th:text="${#numbers.formatDecimal(caja.totalTarjeta, 1, 2)}">0.00</span></div>
+                    </div>
+                </div>
+
+                <div class="resumen-row">
+                    <span class="resumen-label">Monto Inicial:</span>
+                    <span class="resumen-value">S/ <span th:text="${#numbers.formatDecimal(caja.montoInicial, 1, 2)}">0.00</span></span>
+                </div>
+
+                <div class="resumen-row">
+                    <span class="resumen-label">🚗 Vehículos Atendidos:</span>
+                    <span class="resumen-value" th:text="${caja.cantidadVehiculos}">0</span>
+                </div>
+
+                <div class="resumen-row">
+                    <span class="resumen-label">💰 TOTAL DEL DÍA:</span>
+                    <span class="resumen-value">S/ <span th:text="${#numbers.formatDecimal(caja.totalDia, 1, 2)}">0.00</span></span>
+                </div>
+            </div>
+
+            <!-- Arqueo de efectivo -->
+            <div class="arqueo-section">
+                <h5><i class="fas fa-calculator"></i> Arqueo de Efectivo</h5>
+                <p class="mb-0">
+                    Cuente el efectivo físico que tiene en caja y registre el monto total.
+                    El sistema calculará automáticamente la diferencia.
+                </p>
+            </div>
+
+            <form th:action="@{/caja-lavadero/cerrar}" method="post" id="formCerrar">
+                <input type="hidden" name="cajaId" th:value="${caja.id}">
+
+                <!-- Monto contado -->
+                <div class="form-group">
+                    <label class="form-label" for="montoFinalContado">
+                        💵 Monto Total Contado (Efectivo Físico) *
+                    </label>
+                    <div class="input-group">
+                        <span class="input-group-text">S/</span>
+                        <input type="number" 
+                               class="form-control" 
+                               id="montoFinalContado" 
+                               name="montoFinalContado" 
+                               step="0.01" 
+                               min="0"
+                               placeholder="0.00"
+                               required
+                               onchange="calcularDiferencia()">
+                    </div>
+                    <small class="form-text text-muted">
+                        Monto que debería tener: 
+                        <strong>S/ <span th:text="${#numbers.formatDecimal(caja.montoInicial + caja.totalEfectivo, 1, 2)}">0.00</span></strong>
+                        (Inicial + Efectivo del día)
+                    </small>
+                </div>
+
+                <!-- Diferencia calculada -->
+                <div id="diferencia-container" style="display: none;">
+                    <div id="diferencia-display" class="diferencia-display">
+                        <span id="diferencia-texto"></span>
+                    </div>
+                </div>
+
+                <!-- Observaciones -->
+                <div class="form-group">
+                    <label class="form-label" for="observaciones">📝 Observaciones</label>
+                    <textarea class="form-control" 
+                              id="observaciones" 
+                              name="observaciones" 
+                              rows="3"
+                              placeholder="Notas sobre el cierre de caja, incidencias, etc."></textarea>
+                </div>
+
+                <!-- Advertencia -->
+                <div class="warning-box">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Importante:</strong> Una vez cerrada la caja, no podrá modificar ni eliminar registros.
+                    Verifique que todos los datos sean correctos antes de continuar.
+                </div>
+
+                <!-- Botones -->
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-danger btn-submit" onclick="return confirm('¿Está seguro de cerrar la caja? Esta acción no se puede deshacer.')">
+                        <i class="fas fa-lock"></i> Cerrar Caja Definitivamente
+                    </button>
+                    <a th:href="@{/caja-lavadero}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const montoInicial = /*[[${caja.montoInicial}]]*/ 0;
+        const totalEfectivo = /*[[${caja.totalEfectivo}]]*/ 0;
+        const montoEsperado = montoInicial + totalEfectivo;
+
+        function calcularDiferencia() {
+            const montoContado = parseFloat(document.getElementById('montoFinalContado').value) || 0;
+            const diferencia = montoContado - montoEsperado;
+            
+            const container = document.getElementById('diferencia-container');
+            const display = document.getElementById('diferencia-display');
+            const texto = document.getElementById('diferencia-texto');
+            
+            container.style.display = 'block';
+            
+            // Remover clases previas
+            display.classList.remove('positiva', 'negativa', 'cero');
+            
+            if (diferencia > 0) {
+                display.classList.add('positiva');
+                texto.innerHTML = `<i class="fas fa-arrow-up"></i> Sobrante: S/ ${diferencia.toFixed(2)}`;
+            } else if (diferencia < 0) {
+                display.classList.add('negativa');
+                texto.innerHTML = `<i class="fas fa-arrow-down"></i> Faltante: S/ ${Math.abs(diferencia).toFixed(2)}`;
+            } else {
+                display.classList.add('cero');
+                texto.innerHTML = `<i class="fas fa-check-circle"></i> ¡Arqueo Exacto!`;
+            }
+        }
+
+        // Auto-completar con el monto esperado
+        window.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('montoFinalContado').value = montoEsperado.toFixed(2);
+            calcularDiferencia();
+        });
+        /*]]>*/
+    </script>
+</div>
+</body>
+</html>

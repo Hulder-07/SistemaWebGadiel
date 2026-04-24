@@ -1,0 +1,397 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Categorías</title>
+<style>
+  /* ── Variables extra ── */
+  :root {
+    --cat-radius: 16px;
+    --cat-transition: .25s cubic-bezier(.4,0,.2,1);
+  }
+
+  /* ── Toast de éxito ── */
+  .toast-success {
+    display: flex; align-items: center; gap: 12px;
+    background: linear-gradient(135deg, #0f2a1a, #1a4a2a);
+    border: 1px solid rgba(22,163,74,.35);
+    color: #4ade80;
+    border-radius: 12px; padding: 13px 18px;
+    font-size: 13px; font-weight: 600;
+    margin-bottom: 22px;
+    animation: slideDown .3s ease;
+  }
+  .toast-success i { font-size: 16px; color: #22c55e; }
+  @keyframes slideDown {
+    from { opacity:0; transform:translateY(-10px); }
+    to   { opacity:1; transform:translateY(0); }
+  }
+
+  /* ── Header de página ── */
+  .page-header {
+    display: flex; align-items: flex-end; justify-content: space-between;
+    margin-bottom: 28px; gap: 16px;
+  }
+  .page-header-left {}
+  .page-header-eyebrow {
+    font-size: 11px; font-weight: 700; letter-spacing: 2px;
+    text-transform: uppercase; color: var(--accent);
+    margin-bottom: 4px;
+  }
+  .page-header-title {
+    font-family: var(--font-display);
+    font-size: 26px; font-weight: 800;
+    color: var(--text-1); line-height: 1.1;
+    letter-spacing: -.5px;
+  }
+  .page-header-sub {
+    font-size: 13px; color: var(--text-3);
+    margin-top: 4px;
+  }
+  .btn-nueva-cat {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: var(--accent);
+    color: #fff;
+    padding: 11px 22px;
+    border-radius: 10px;
+    font-size: 13px; font-weight: 700;
+    font-family: var(--font-display);
+    letter-spacing: .2px;
+    text-decoration: none;
+    border: none; cursor: pointer;
+    transition: all var(--cat-transition);
+    box-shadow: 0 4px 18px rgba(255,18,18,.28);
+    white-space: nowrap;
+  }
+  .btn-nueva-cat:hover {
+    background: var(--accent-dark);
+    transform: translateY(-1px);
+    box-shadow: 0 6px 24px rgba(255,18,18,.38);
+  }
+  .btn-nueva-cat i { font-size: 12px; }
+
+  /* ── Stat strip ── */
+  .stat-strip {
+    display: flex; gap: 12px; margin-bottom: 28px; flex-wrap: wrap;
+  }
+  .stat-pill {
+    display: flex; align-items: center; gap: 8px;
+    background: var(--bg-card);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 7px 16px;
+    font-size: 12px; font-weight: 600; color: var(--text-2);
+  }
+  .stat-pill-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+  }
+
+  /* ── Grid de categorías ── */
+  .cat-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+    gap: 20px;
+  }
+
+  /* ── Card ── */
+  .cat-card {
+    background: var(--bg-card);
+    border-radius: var(--cat-radius);
+    border: 1px solid var(--border);
+    overflow: hidden;
+    transition: transform var(--cat-transition), box-shadow var(--cat-transition), border-color var(--cat-transition);
+    position: relative;
+    cursor: default;
+  }
+  .cat-card:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 40px rgba(120,40,40,.13);
+    border-color: var(--border-mid);
+  }
+
+  /* Banner superior */
+  .cat-card-banner {
+    height: 120px;
+    position: relative;
+    display: flex; align-items: center; justify-content: center;
+    overflow: hidden;
+  }
+  /* Patrón de puntos sobre el banner */
+  .cat-card-banner::before {
+    content: '';
+    position: absolute; inset: 0;
+    background-image: radial-gradient(circle, rgba(255,255,255,.12) 1px, transparent 1px);
+    background-size: 18px 18px;
+    z-index: 1;
+  }
+  /* Brillo diagonal */
+  .cat-card-banner::after {
+    content: '';
+    position: absolute;
+    top: -40%; left: -20%;
+    width: 60%; height: 180%;
+    background: linear-gradient(105deg, rgba(255,255,255,.15) 0%, transparent 60%);
+    z-index: 2;
+    transform: skewX(-15deg);
+  }
+
+  /* Icono central del banner */
+  .cat-card-icon {
+    width: 56px; height: 56px;
+    border-radius: 14px;
+    background: rgba(255,255,255,.18);
+    backdrop-filter: blur(4px);
+    border: 1px solid rgba(255,255,255,.25);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px; color: #fff;
+    z-index: 3; position: relative;
+    box-shadow: 0 4px 16px rgba(0,0,0,.2);
+    transition: transform var(--cat-transition);
+  }
+  .cat-card:hover .cat-card-icon {
+    transform: scale(1.08) rotate(-3deg);
+  }
+
+  /* Badge de cantidad */
+  .cat-card-qty {
+    position: absolute; top: 12px; right: 12px;
+    z-index: 4;
+    background: rgba(0,0,0,.35);
+    backdrop-filter: blur(6px);
+    border: 1px solid rgba(255,255,255,.2);
+    border-radius: 100px;
+    padding: 3px 10px;
+    font-size: 10.5px; font-weight: 700; color: #fff;
+    letter-spacing: .3px;
+  }
+
+  /* Número de orden */
+  .cat-card-num {
+    position: absolute; top: 12px; left: 12px;
+    z-index: 4;
+    font-family: var(--font-mono);
+    font-size: 10px; font-weight: 600;
+    color: rgba(255,255,255,.5);
+  }
+
+  /* Cuerpo de la card */
+  .cat-card-body {
+    padding: 18px 18px 16px;
+  }
+  .cat-card-name {
+    font-family: var(--font-display);
+    font-size: 15.5px; font-weight: 800;
+    color: var(--text-1); letter-spacing: -.2px;
+    margin-bottom: 5px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+  .cat-card-desc {
+    font-size: 12px; color: var(--text-3);
+    line-height: 1.5; min-height: 36px;
+    display: -webkit-box; -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical; overflow: hidden;
+    margin-bottom: 16px;
+  }
+
+  /* Acciones */
+  .cat-card-actions {
+    display: flex; gap: 8px;
+  }
+  .cat-btn {
+    flex: 1;
+    display: inline-flex; align-items: center; justify-content: center; gap: 6px;
+    padding: 8px 12px;
+    border-radius: 8px;
+    font-size: 12px; font-weight: 700;
+    font-family: var(--font-body);
+    text-decoration: none; border: none; cursor: pointer;
+    transition: all var(--cat-transition);
+    letter-spacing: .1px;
+  }
+  .cat-btn-edit {
+    background: var(--bg);
+    color: var(--text-2);
+    border: 1px solid var(--border);
+  }
+  .cat-btn-edit:hover {
+    background: var(--accent-light);
+    color: var(--accent-dark);
+    border-color: rgba(255,18,18,.25);
+  }
+  .cat-btn-del {
+    background: transparent;
+    color: var(--text-3);
+    border: 1px solid var(--border);
+  }
+  .cat-btn-del:hover {
+    background: rgba(255,18,18,.08);
+    color: var(--accent);
+    border-color: rgba(255,18,18,.3);
+  }
+  .cat-btn i { font-size: 11px; }
+
+  /* Línea de color inferior */
+  .cat-card-stripe {
+    height: 3px;
+    width: 100%;
+    margin-top: 0;
+  }
+
+  /* ── Paleta de gradientes ── */
+  .bg-0 { background: linear-gradient(135deg, #1a0505 0%, #7f1d1d 50%, #dc2626 100%); }
+  .bg-1 { background: linear-gradient(135deg, #1c0a00 0%, #7c2d12 50%, #ea580c 100%); }
+  .bg-2 { background: linear-gradient(135deg, #0a0a1a 0%, #1e1b4b 50%, #4f46e5 100%); }
+  .bg-3 { background: linear-gradient(135deg, #0a1a0a 0%, #14532d 50%, #16a34a 100%); }
+  .bg-4 { background: linear-gradient(135deg, #1a0a10 0%, #831843 50%, #db2777 100%); }
+  .bg-5 { background: linear-gradient(135deg, #0a1520 0%, #0c4a6e 50%, #0284c7 100%); }
+  .bg-6 { background: linear-gradient(135deg, #1a1500 0%, #713f12 50%, #ca8a04 100%); }
+  .bg-7 { background: linear-gradient(135deg, #0f0a1a 0%, #4a1d96 50%, #7c3aed 100%); }
+  .bg-8 { background: linear-gradient(135deg, #001a1a 0%, #134e4a 50%, #0d9488 100%); }
+  .bg-9 { background: linear-gradient(135deg, #1a0000 0%, #450a0a 50%, #991b1b 100%); }
+
+  .stripe-0 { background: #dc2626; }
+  .stripe-1 { background: #ea580c; }
+  .stripe-2 { background: #4f46e5; }
+  .stripe-3 { background: #16a34a; }
+  .stripe-4 { background: #db2777; }
+  .stripe-5 { background: #0284c7; }
+  .stripe-6 { background: #ca8a04; }
+  .stripe-7 { background: #7c3aed; }
+  .stripe-8 { background: #0d9488; }
+  .stripe-9 { background: #991b1b; }
+
+  /* ── Empty state ── */
+  .empty-cats {
+    background: var(--bg-card);
+    border: 1.5px dashed var(--border-mid);
+    border-radius: var(--cat-radius);
+    padding: 64px 32px;
+    text-align: center;
+    color: var(--text-3);
+  }
+  .empty-cats-icon {
+    width: 72px; height: 72px;
+    background: var(--accent-light);
+    border-radius: 18px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px; color: var(--accent);
+    margin: 0 auto 18px;
+    border: 1px solid rgba(255,18,18,.15);
+  }
+  .empty-cats-title {
+    font-family: var(--font-display);
+    font-size: 17px; font-weight: 800;
+    color: var(--text-1); margin-bottom: 6px;
+  }
+  .empty-cats-sub {
+    font-size: 13px; color: var(--text-3); margin-bottom: 22px;
+  }
+
+  /* Animación de entrada escalonada */
+  .cat-card {
+    opacity: 0;
+    transform: translateY(16px);
+    animation: cardIn .4s var(--cat-transition) forwards;
+  }
+  @keyframes cardIn {
+    to { opacity:1; transform:translateY(0); }
+  }
+  .cat-card:nth-child(1)  { animation-delay: .04s; }
+  .cat-card:nth-child(2)  { animation-delay: .08s; }
+  .cat-card:nth-child(3)  { animation-delay: .12s; }
+  .cat-card:nth-child(4)  { animation-delay: .16s; }
+  .cat-card:nth-child(5)  { animation-delay: .20s; }
+  .cat-card:nth-child(6)  { animation-delay: .24s; }
+  .cat-card:nth-child(7)  { animation-delay: .28s; }
+  .cat-card:nth-child(8)  { animation-delay: .32s; }
+  .cat-card:nth-child(9)  { animation-delay: .36s; }
+  .cat-card:nth-child(10) { animation-delay: .40s; }
+</style>
+</head>
+<body>
+<div layout:fragment="page-title">Categorías</div>
+<div layout:fragment="content">
+
+  <!-- Toast éxito -->
+  <div th:if="${msg}" class="toast-success">
+    <i class="fa-solid fa-circle-check"></i>
+    <span th:text="${msg}"></span>
+  </div>
+
+  <!-- Header -->
+  <div class="page-header">
+    <div class="page-header-left">
+      <div class="page-header-eyebrow">Tienda</div>
+      <div class="page-header-title">Categorías</div>
+      <div class="page-header-sub"
+           th:text="${#lists.size(categorias)} + ' categorías registradas en el sistema'"></div>
+    </div>
+    <a th:href="@{/categorias/nueva}" class="btn-nueva-cat">
+      <i class="fa-solid fa-plus"></i> Nueva Categoría
+    </a>
+  </div>
+
+  <!-- Stat strip -->
+  <div class="stat-strip" th:unless="${#lists.isEmpty(categorias)}">
+    <div class="stat-pill">
+      <div class="stat-pill-dot" style="background:var(--accent);"></div>
+      <span th:text="${#lists.size(categorias)} + ' categorías'"></span>
+    </div>
+    <div class="stat-pill">
+      <div class="stat-pill-dot" style="background:var(--green);"></div>
+      <span>Productos organizados</span>
+    </div>
+  </div>
+
+  <!-- Empty state -->
+  <div th:if="${#lists.isEmpty(categorias)}" class="empty-cats">
+    <div class="empty-cats-icon"><i class="fa-solid fa-tags"></i></div>
+    <div class="empty-cats-title">Sin categorías aún</div>
+    <div class="empty-cats-sub">Crea tu primera categoría para organizar tus productos</div>
+    <a th:href="@{/categorias/nueva}" class="btn-nueva-cat" style="display:inline-flex;">
+      <i class="fa-solid fa-plus"></i> Crear primera categoría
+    </a>
+  </div>
+
+  <!-- Grid de cards -->
+  <div th:unless="${#lists.isEmpty(categorias)}" class="cat-grid">
+
+    <div th:each="c, stat : ${categorias}" class="cat-card">
+
+      <!-- Banner -->
+      <div class="cat-card-banner" th:classappend="'bg-' + ${stat.index % 10}">
+        <span class="cat-card-num" th:text="'#' + ${stat.count}"></span>
+        <div class="cat-card-icon">
+          <i th:class="${c.icono != null and !c.icono.isEmpty()} ? ${c.icono} : 'fa-solid fa-tag'"></i>
+        </div>
+        <span class="cat-card-qty"
+              th:text="${c.productos != null ? c.productos.size() : 0} + ' productos'"></span>
+      </div>
+
+      <!-- Stripe de color -->
+      <div class="cat-card-stripe" th:classappend="'stripe-' + ${stat.index % 10}"></div>
+
+      <!-- Cuerpo -->
+      <div class="cat-card-body">
+        <div class="cat-card-name" th:text="${c.nombre}"></div>
+        <div class="cat-card-desc" th:text="${c.descripcion ?: 'Sin descripción disponible'}"></div>
+
+        <div class="cat-card-actions">
+          <a th:href="@{/categorias/editar/{id}(id=${c.id})}" class="cat-btn cat-btn-edit">
+            <i class="fa-solid fa-pen-to-square"></i> Editar
+          </a>
+          <a th:href="@{/categorias/eliminar/{id}(id=${c.id})}"
+             onclick="return confirm('¿Seguro que deseas eliminar esta categoría? Esta acción no se puede deshacer.')"
+             class="cat-btn cat-btn-del">
+            <i class="fa-solid fa-trash-can"></i> Eliminar
+          </a>
+        </div>
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+</body>
+</html>

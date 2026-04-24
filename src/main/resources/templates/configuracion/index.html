@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Configuración</title>
+</head>
+<body>
+<div layout:fragment="page-title">Configuración</div>
+<div layout:fragment="content">
+
+<div style="max-width: 1400px; margin: 0 auto;">
+    
+    <!-- Buscador -->
+    <div style="margin-bottom: 2rem;">
+        <input type="text" 
+               class="form-control" 
+               id="searchConfig"
+               placeholder="🔍 Buscar una opción de configuración"
+               style="max-width: 600px;">
+    </div>
+
+    <!-- Grid de opciones -->
+    <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 1.5rem; margin-bottom: 3rem;">
+        
+        <!-- Inicio -->
+        <a th:href="@{/dashboard}" class="config-card">
+            <div class="config-icon" style="background: #fee2e2;">
+                <i class="fas fa-home" style="color: #dc2626;"></i>
+            </div>
+            <div>
+                <h3>Inicio</h3>
+                <p>Panel de control</p>
+            </div>
+        </a>
+
+        <!-- Sistema -->
+        <a th:href="@{/configuracion/sistema}" class="config-card">
+            <div class="config-icon" style="background: #dbeafe;">
+                <i class="fas fa-desktop" style="color: #2563eb;"></i>
+            </div>
+            <div>
+                <h3>Sistema</h3>
+                <p>Datos, personalización, hora</p>
+            </div>
+        </a>
+
+        <!-- Accesibilidad -->
+        <a th:href="@{/configuracion/accesibilidad}" class="config-card">
+            <div class="config-icon" style="background: #f3e8ff;">
+                <i class="fas fa-universal-access" style="color: #9333ea;"></i>
+            </div>
+            <div>
+                <h3>Accesibilidad</h3>
+                <p>Texto, contraste</p>
+            </div>
+        </a>
+
+        <!-- Cuentas -->
+        <a th:href="@{/usuarios}" class="config-card">
+            <div class="config-icon" style="background: #d1fae5;">
+                <i class="fas fa-users" style="color: #059669;"></i>
+            </div>
+            <div>
+                <h3>Cuentas</h3>
+                <p>Usuarios y roles</p>
+            </div>
+        </a>
+
+        <!-- Facturación -->
+        <a th:href="@{/configuracion/facturacion}" class="config-card">
+            <div class="config-icon" style="background: #fee2e2;">
+                <i class="fas fa-file-invoice" style="color: #dc2626;"></i>
+            </div>
+            <div>
+                <h3>Facturación</h3>
+                <p>SUNAT, comprobantes</p>
+            </div>
+        </a>
+
+        <!-- Privacidad -->
+        <a th:href="@{/configuracion/copias-seguridad}" class="config-card">
+            <div class="config-icon" style="background: #e0e7ff;">
+                <i class="fas fa-lock" style="color: #4f46e5;"></i>
+            </div>
+            <div>
+                <h3>Privacidad</h3>
+                <p>Copias, historial</p>
+            </div>
+        </a>
+
+        <!-- Actualizaciones -->
+        <a th:href="@{/configuracion/actualizaciones}" class="config-card">
+            <div class="config-icon" style="background: #fef3c7;">
+                <i class="fas fa-sync-alt" style="color: #d97706;"></i>
+            </div>
+            <div>
+                <h3>Actualizaciones</h3>
+                <p>Versión del sistema</p>
+            </div>
+        </a>
+    </div>
+
+    <!-- Sección: Configuración recomendada -->
+    <div style="margin-top: 3rem;">
+    <div style="font-size:20px;font-weight:800;color:var(--text-primary);font-family:var(--font-display);letter-spacing:-.4px;">Configuración recomendada</div>
+
+        <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem;">
+            
+            <!-- Personalización -->
+            <a th:href="@{/configuracion/personalizacion}" class="config-card-simple">
+                <i class="fas fa-paint-brush" style="font-size: 2rem; color: #dc2626;"></i>
+                <h3>Personalización</h3>
+            </a>
+
+            <!-- Hora e idioma -->
+            <a th:href="@{/configuracion/hora-idioma}" class="config-card-simple">
+                <i class="fas fa-clock" style="font-size: 2rem; color: #dc2626;"></i>
+                <h3>Hora e idioma</h3>
+            </a>
+
+            <!-- Copias de seguridad -->
+            <a th:href="@{/configuracion/copias-seguridad}" class="config-card-simple">
+                <i class="fas fa-database" style="font-size: 2rem; color: #dc2626;"></i>
+                <h3>Copias de seguridad</h3>
+            </a>
+        </div>
+    </div>
+
+    <!-- Sección: Dispositivos conectados -->
+    <div style="margin-top: 3rem;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem;">
+    <div style="font-size:20px;font-weight:800;color:var(--text-primary);font-family:var(--font-display);letter-spacing:-.4px;">Dispositivos conectados</div>
+            <a th:href="@{/configuracion/dispositivos}" style="color: #dc2626; text-decoration: none; font-weight: 600;">
+                Administrar
+            </a>
+        </div>
+
+        <div style="background: white; border-radius: 12px; padding: 1.5rem; box-shadow: 0 1px 3px rgba(0,0,0,0.1);">
+            
+            <!-- Impresora Térmica -->
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0; border-bottom: 1px solid #e5e7eb;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <i class="fas fa-print" style="font-size: 1.5rem; color: #6b7280;"></i>
+                    <div>
+                        <h4 style="margin: 0; font-size: 1rem;">Impresora Térmica</h4>
+                        <small style="color: #6b7280;" th:text="${config.impresoraTermica ?: 'Conectada'}">Conectada</small>
+                    </div>
+                </div>
+                <span class="badge" 
+                      th:classappend="${config.impresoraConectada ? 'bg-success' : 'bg-secondary'}"
+                      th:text="${config.impresoraConectada ? 'Activo' : 'Offline'}">
+                    Activo
+                </span>
+            </div>
+
+            <!-- Tablet Cajero -->
+            <div style="display: flex; align-items: center; justify-content: space-between; padding: 1rem 0;">
+                <div style="display: flex; align-items: center; gap: 1rem;">
+                    <i class="fas fa-tablet-alt" style="font-size: 1.5rem; color: #6b7280;"></i>
+                    <div>
+                        <h4 style="margin: 0; font-size: 1rem;">Tablet Cajero</h4>
+                        <small style="color: #6b7280;" th:text="${config.tabletCajero ?: 'Desconectado'}">Desconectado</small>
+                    </div>
+                </div>
+                <span class="badge" 
+                      th:classappend="${config.tabletConectada ? 'bg-success' : 'bg-secondary'}"
+                      th:text="${config.tabletConectada ? 'Activo' : 'Offline'}">
+                    Offline
+                </span>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+.config-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1.5rem;
+    background: white;
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+}
+
+.config-card:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+.config-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.5rem;
+    flex-shrink: 0;
+}
+
+.config-card h3 {
+    margin: 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.config-card p {
+    margin: 0.25rem 0 0;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.config-card-simple {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem 1.5rem;
+    background: white;
+    border-radius: 12px;
+    text-decoration: none;
+    color: inherit;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+    transition: all 0.2s;
+    text-align: center;
+}
+
+.config-card-simple:hover {
+    box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    transform: translateY(-2px);
+}
+
+.config-card-simple h3 {
+    margin: 1rem 0 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+</style>
+
+<script>
+// Búsqueda en vivo
+document.getElementById('searchConfig').addEventListener('input', function() {
+    const search = this.value.toLowerCase();
+    document.querySelectorAll('.config-card, .config-card-simple').forEach(card => {
+        const text = card.textContent.toLowerCase();
+        card.style.display = text.includes(search) ? '' : 'none';
+    });
+});
+</script>
+
+</th:block>
+</body>
+</html>

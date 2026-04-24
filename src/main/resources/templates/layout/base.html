@@ -1,0 +1,806 @@
+<!DOCTYPE html>
+<html lang="es"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title layout:title-pattern="$CONTENT_TITLE - Car Detailing Gadiel">Car Detailing Gadiel</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" th:href="@{/css/style.css}"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+
+  <style>
+    /* ══════════════════════════════════════════
+       DESIGN TOKENS — LIGHT THEME
+    ══════════════════════════════════════════ */
+    :root {
+      --bg:           #edd8d8;
+      --bg-mid:       #e4c8c8;
+      --bg-card:      #ffffff;
+      --bg-glass:     rgba(255,255,255,0.65);
+      --border:       rgba(180,120,120,0.18);
+      --border-mid:   rgba(180,120,120,0.32);
+      --text-1:       #1a0a0a;
+      --text-2:       #6b3a3a;
+      --text-3:       #b08080;
+      --accent:       #ff1212;
+      --accent-dark:  #cc0000;
+      --accent-glow:  rgba(255,18,18,0.10);
+      --accent-light: rgba(255,18,18,0.06);
+      --green:        #16a34a;
+      --green-glow:   rgba(22,163,74,0.12);
+      --yellow:       #b45309;
+      --yellow-glow:  rgba(180,83,9,0.10);
+      --blue:         #1d6fb8;
+      --orange:       #c05414;
+      --cyan:         #0e7490;
+      --purple:       #6d28d9;
+      --sidebar-w:    244px;
+      --topbar-h:     62px;
+      --radius:       14px;
+      --font-display: 'Syne', sans-serif;
+      --font-body:    'DM Sans', sans-serif;
+      --font-mono:    'DM Mono', monospace;
+      --shadow:       0 4px 24px rgba(120,40,40,0.10);
+      --shadow-lg:    0 8px 40px rgba(120,40,40,0.14);
+      --transition:   .2s cubic-bezier(.4,0,.2,1);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text-1);
+      font-family: var(--font-body);
+      font-size: 14px;
+      line-height: 1.55;
+      display: flex;
+      min-height: 100vh;
+      overflow-x: hidden;
+    }
+
+    a { text-decoration: none; color: inherit; }
+    button { cursor: pointer; font-family: inherit; }
+
+    /* ══════════════════════════════════════════
+       SIDEBAR
+    ══════════════════════════════════════════ */
+    .sidebar {
+      position: fixed;
+      top: 0; left: 0; bottom: 0;
+      width: var(--sidebar-w);
+      background: var(--bg-card);
+      border-right: 1px solid var(--border);
+      display: flex;
+      flex-direction: column;
+      z-index: 100;
+      transition: width var(--transition);
+      overflow: hidden;
+      box-shadow: var(--shadow);
+    }
+
+    /* Brand */
+    .sidebar-brand {
+      padding: 0 16px;
+      height: var(--topbar-h);
+      display: flex;
+      align-items: center;
+      border-bottom: 1px solid var(--border);
+      flex-shrink: 0;
+      background: var(--bg-card);
+    }
+    .brand-logo {
+      display: flex; align-items: center; gap: 11px;
+      text-decoration: none; width: 100%;
+    }
+    .brand-img-wrap {
+      width: 36px; height: 36px;
+      border-radius: 10px;
+      overflow: hidden; flex-shrink: 0;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      box-shadow: 0 0 16px var(--accent-glow);
+    }
+    .brand-img-wrap img { width: 100%; height: 100%; object-fit: cover; }
+    .brand-img-wrap i   { color: #fff; font-size: 17px; }
+    .brand-text { overflow: hidden; white-space: nowrap; max-width: 140px; }
+    .brand-name {
+      font-family: var(--font-display);
+      font-size: 13.5px; font-weight: 800;
+      letter-spacing: -.3px; color: var(--text-1); line-height: 1.2;
+      display: inline-block;
+      animation: marquee-brand 6s linear infinite;
+      white-space: nowrap;
+    }
+    @keyframes marquee-brand {
+      0%   { transform: translateX(0); }
+      30%  { transform: translateX(0); }
+      70%  { transform: translateX(-60%); }
+      100% { transform: translateX(0); }
+    }
+    .brand-sub {
+      font-size: 10px; color: var(--text-3);
+      font-weight: 500; letter-spacing: .6px; text-transform: uppercase;
+    }
+
+    /* Nav scroll */
+    .sidebar-nav {
+      flex: 1; overflow-y: auto; overflow-x: hidden;
+      padding: 8px 0;
+      scrollbar-width: thin;
+      scrollbar-color: var(--border) transparent;
+    }
+    .sidebar-nav::-webkit-scrollbar { width: 4px; }
+    .sidebar-nav::-webkit-scrollbar-thumb { background: var(--border-mid); border-radius: 2px; }
+
+    /* Section labels */
+    .nav-section-label {
+      font-size: 9.5px; font-weight: 700;
+      letter-spacing: 1.5px; text-transform: uppercase;
+      color: var(--text-3);
+      padding: 14px 20px 5px;
+      white-space: nowrap; overflow: hidden;
+    }
+
+    /* Nav item */
+    .nav-item {
+      display: flex; align-items: center; gap: 10px;
+      padding: 8px 12px 8px 14px;
+      margin: 1px 8px;
+      border-radius: 10px;
+      color: var(--text-2);
+      font-size: 13px; font-weight: 500;
+      transition: all var(--transition);
+      position: relative;
+      white-space: nowrap; overflow: hidden;
+      border: 1px solid transparent;
+    }
+    .nav-item .icon {
+      width: 30px; height: 30px;
+      border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; flex-shrink: 0;
+      transition: all var(--transition);
+      color: var(--text-3);
+      background: transparent;
+    }
+    .nav-item:hover {
+      background: var(--accent-light);
+      color: var(--text-1);
+      border-color: var(--border);
+    }
+    .nav-item:hover .icon { color: var(--accent); background: var(--accent-glow); }
+
+    .nav-item.active {
+      background: var(--accent-light);
+      color: var(--accent-dark);
+      border-color: rgba(255,18,18,0.15);
+      font-weight: 600;
+    }
+    .nav-item.active .icon {
+      color: var(--accent);
+      background: var(--accent-glow);
+    }
+    .nav-item.active::before {
+      content: '';
+      position: absolute; left: -8px; top: 50%;
+      transform: translateY(-50%);
+      width: 3px; height: 18px;
+      background: var(--accent);
+      border-radius: 0 3px 3px 0;
+    }
+
+    .stock-badge {
+      margin-left: auto;
+      background: var(--accent);
+      color: #fff;
+      font-size: 9px; font-weight: 800;
+      padding: 2px 7px; border-radius: 100px; flex-shrink: 0;
+    }
+
+    /* Sidebar footer */
+    .sidebar-footer {
+      padding: 12px; border-top: 1px solid var(--border); flex-shrink: 0;
+    }
+    .user-card {
+      display: flex; align-items: center; gap: 10px;
+      padding: 10px 12px; border-radius: 10px;
+      background: var(--bg);
+      border: 1px solid var(--border);
+      white-space: nowrap; overflow: hidden;
+    }
+    .user-avatar {
+      width: 32px; height: 32px; border-radius: 8px;
+      background: var(--accent);
+      display: flex; align-items: center; justify-content: center;
+      font-family: var(--font-display);
+      font-size: 14px; font-weight: 800;
+      color: #fff; flex-shrink: 0;
+      box-shadow: 0 0 12px var(--accent-glow);
+    }
+    .user-info { overflow: hidden; }
+    .user-name {
+      font-size: 12px; font-weight: 700; color: var(--text-1);
+      white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+    }
+    .user-role { font-size: 10px; color: var(--text-3); font-weight: 500; }
+
+    /* Compact state */
+    .sidebar.compact { width: 68px; }
+    .sidebar.compact .brand-text,
+    .sidebar.compact .nav-text,
+    .sidebar.compact .nav-section-label,
+    .sidebar.compact .stock-badge,
+    .sidebar.compact .user-info { display: none; }
+    .sidebar.compact .nav-item { padding: 8px; justify-content: center; gap: 0; }
+    .sidebar.compact .user-card { justify-content: center; padding: 8px; }
+    .sidebar.compact ~ .main-content { margin-left: 68px; }
+
+    /* ══════════════════════════════════════════
+       MAIN CONTENT
+    ══════════════════════════════════════════ */
+    .main-content {
+      margin-left: var(--sidebar-w);
+      flex: 1; display: flex; flex-direction: column; min-height: 100vh;
+      transition: margin-left var(--transition);
+    }
+
+    /* ══════════════════════════════════════════
+       TOPBAR
+    ══════════════════════════════════════════ */
+    .topbar {
+      position: sticky; top: 0;
+      height: var(--topbar-h);
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 0 28px; z-index: 50;
+      box-shadow: 0 1px 8px rgba(120,40,40,0.07);
+      gap: 16px;
+    }
+
+    .topbar-left { display: flex; align-items: center; gap: 14px; }
+
+    .menu-toggle {
+      width: 34px; height: 34px; border-radius: 9px;
+      background: var(--bg); border: 1px solid var(--border);
+      color: var(--text-2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 14px; cursor: pointer;
+      transition: all var(--transition);
+    }
+    .menu-toggle:hover { border-color: var(--border-mid); color: var(--text-1); background: var(--accent-light); }
+
+    .topbar-title-block { display: flex; flex-direction: column; gap: 1px; }
+    .page-title {
+      font-family: var(--font-display);
+      font-size: 18px; font-weight: 800;
+      letter-spacing: -.4px; color: var(--text-1); line-height: 1;
+    }
+    .topbar-clock {
+      display: flex; align-items: center; gap: 7px;
+      font-size: 11px; color: var(--text-3);
+    }
+    .live-dot {
+      width: 6px; height: 6px; border-radius: 50%;
+      background: var(--green);
+      box-shadow: 0 0 6px var(--green);
+      animation: blink 2s infinite;
+    }
+    @keyframes blink { 0%,100%{ opacity:1; } 50%{ opacity:.3; } }
+    .clock-display {
+      font-family: var(--font-mono); font-size: 11px;
+      font-weight: 500; color: var(--text-2);
+    }
+
+    /* Topbar right */
+    .topbar-right { display: flex; align-items: center; gap: 4px; }
+
+    .tb-btn {
+      width: 36px; height: 36px; border-radius: 9px;
+      background: transparent; border: 1px solid transparent;
+      color: var(--text-2);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 15px; cursor: pointer;
+      transition: all var(--transition); text-decoration: none;
+    }
+    .tb-btn:hover {
+      background: var(--bg); border-color: var(--border); color: var(--text-1);
+    }
+    .tb-btn.danger:hover {
+      color: var(--accent); border-color: rgba(255,18,18,0.2);
+      background: var(--accent-light);
+    }
+
+    /* ══════════════════════════════════════════
+       NOTIFICATION PANEL
+    ══════════════════════════════════════════ */
+    .notif-wrapper { position: relative; }
+    .notif-badge {
+      position: absolute; top: -3px; right: -3px;
+      background: var(--accent); color: #fff;
+      border-radius: 100px; min-width: 16px; height: 16px;
+      padding: 0 4px; font-size: 9px; font-weight: 800;
+      display: none; align-items: center; justify-content: center;
+      border: 2px solid var(--bg-card);
+      font-family: var(--font-mono); line-height: 1;
+    }
+    .notif-badge.show { display: flex; }
+
+    .notif-panel {
+      display: none;
+      position: absolute; top: calc(100% + 10px); right: 0;
+      width: 340px;
+      background: var(--bg-card);
+      border: 1px solid var(--border-mid);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow-lg);
+      z-index: 200; overflow: hidden; flex-direction: column;
+      animation: fadeDown .15s ease;
+    }
+    .notif-panel.open { display: flex; }
+    @keyframes fadeDown {
+      from { opacity:0; transform:translateY(-6px); }
+      to   { opacity:1; transform:translateY(0); }
+    }
+
+    .notif-head {
+      padding: 13px 18px; border-bottom: 1px solid var(--border);
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .notif-head-title {
+      font-family: var(--font-display);
+      font-size: 13px; font-weight: 700; color: var(--text-1);
+      display: flex; align-items: center; gap: 7px;
+    }
+    .notif-head-title i { color: var(--accent); font-size: 12px; }
+    .notif-head-count { font-size: 11px; color: var(--text-3); font-family: var(--font-mono); }
+
+    .notif-list { overflow-y: auto; max-height: 360px; }
+    .notif-item {
+      display: flex; align-items: flex-start; gap: 12px;
+      padding: 13px 18px; border-bottom: 1px solid var(--border);
+      text-decoration: none; transition: background var(--transition);
+    }
+    .notif-item:last-child { border-bottom: none; }
+    .notif-item:hover { background: var(--bg); }
+    .notif-icon {
+      width: 34px; height: 34px; border-radius: 9px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 13px; flex-shrink: 0;
+    }
+    .notif-icon.peligro { background: rgba(255,18,18,.10); color: var(--accent); }
+    .notif-icon.alerta  { background: rgba(180,83,9,.10); color: var(--yellow); }
+    .notif-titulo  { font-size: 12px; font-weight: 700; color: var(--text-1); }
+    .notif-mensaje { font-size: 11px; color: var(--text-2); margin-top: 2px; line-height: 1.4; }
+    .notif-empty {
+      padding: 36px 20px; text-align: center;
+      color: var(--text-3); font-size: 13px;
+    }
+    .notif-empty i { font-size: 26px; display: block; margin-bottom: 10px; opacity: .4; }
+
+    /* ══════════════════════════════════════════
+       PAGE BODY
+    ══════════════════════════════════════════ */
+    .page-body { flex: 1; padding: 28px 32px; }
+
+    /* ══════════════════════════════════════════
+       AUDIO BUTTON
+    ══════════════════════════════════════════ */
+    #audioActivador {
+      position: fixed; bottom: 24px; right: 24px; z-index: 9999;
+      background: var(--accent); color: #fff;
+      padding: 10px 20px; border-radius: 100px;
+      font-size: 12px; font-weight: 700;
+      display: flex; align-items: center; gap: 8px;
+      border: none; font-family: var(--font-display); letter-spacing: .3px;
+      box-shadow: 0 4px 20px var(--accent-glow);
+      animation: pulse-btn 2.5s infinite;
+    }
+    #audioActivador.oculto { display: none !important; }
+    @keyframes pulse-btn {
+      0%,100% { box-shadow: 0 4px 20px rgba(255,18,18,0.3); }
+      50%      { box-shadow: 0 4px 36px rgba(255,18,18,0.6); }
+    }
+
+    /* ══════════════════════════════════════════
+       RESPONSIVE
+    ══════════════════════════════════════════ */
+    @media (max-width: 768px) {
+      .sidebar { transform: translateX(-100%); }
+      .sidebar.open { transform: translateX(0); }
+      .main-content { margin-left: 0; }
+      .page-body { padding: 18px 14px; }
+    }
+  </style>
+</head>
+<body>
+
+<button id="audioActivador" onclick="activarAudio()">
+  <i class="fa-solid fa-bell"></i> Activar alertas
+</button>
+
+<!-- ══ SIDEBAR ══════════════════════════════════════════ -->
+<aside class="sidebar" id="sidebar">
+  <div class="sidebar-brand">
+    <a class="brand-logo" th:href="@{/dashboard}">
+      <div class="brand-img-wrap">
+        <img th:src="@{/images/logo.jpeg}" alt="Logo"
+             onerror="this.style.display='none';this.nextElementSibling.style.display='flex';">
+        <i class="fa-solid fa-soap" style="display:none;"></i>
+      </div>
+      <div class="brand-text">
+        <div class="brand-name">Lubricentro Car Detailing Gadiel</div>
+        <div class="brand-sub">Sistema de Gestión</div>
+      </div>
+    </a>
+  </div>
+
+  <nav class="sidebar-nav">
+
+    <div class="nav-section-label">Principal</div>
+    <a th:href="@{/dashboard}" class="nav-item" th:classappend="${activePage == 'dashboard'} ? ' active' : ''">
+      <span class="icon"><i class="fa-solid fa-chart-pie"></i></span>
+      <span class="nav-text">Dashboard</span>
+    </a>
+
+<!-- LAVADOS -->
+<div class="nav-section-label">LAVADOS</div>
+<a th:href="@{/ordenes}" class="nav-item" th:classappend="${activePage == 'ordenes'} ? 'active' : ''">
+  <span class="icon"><i class="fa-solid fa-soap"></i></span>
+  <span class="nav-text">Órdenes de Servicio</span>
+</a>
+<a th:href="@{/servicios}" class="nav-item" th:classappend="${activePage == 'servicios'} ? 'active' : ''">
+  <span class="icon"><i class="fa-solid fa-list-check"></i></span>
+  <span class="nav-text">Catálogo de Servicios</span>
+</a>
+
+    <div class="nav-section-label">Tienda</div>
+    <a th:href="@{/ventas}" class="nav-item" th:classappend="${activePage == 'ventas'} ? ' active' : ''">
+      <span class="icon"><i class="fa-solid fa-bag-shopping"></i></span>
+      <span class="nav-text">Ventas</span>
+    </a>
+    <a th:href="@{/productos}" class="nav-item" th:classappend="${activePage == 'productos'} ? ' active' : ''">
+      <span class="icon"><i class="fa-solid fa-boxes-stacked"></i></span>
+      <span class="nav-text">Productos</span>
+    </a>
+    <a th:href="@{/categorias}" class="nav-item" th:classappend="${activePage == 'categorias'} ? ' active' : ''">
+      <span class="icon"><i class="fa-solid fa-tags"></i></span>
+      <span class="nav-text">Categorías</span>
+    </a>
+
+    <div class="nav-section-label">Clientes</div>
+    <a th:href="@{/clientes}" class="nav-item" th:classappend="${activePage == 'clientes'} ? ' active' : ''">
+      <span class="icon"><i class="fa-solid fa-users"></i></span>
+      <span class="nav-text">Clientes</span>
+    </a>
+    <a th:href="@{/vehiculos}" class="nav-item" th:classappend="${activePage == 'vehiculos'} ? ' active' : ''">
+      <span class="icon"><i class="fa-solid fa-car"></i></span>
+      <span class="nav-text">Vehículos</span>
+    </a>
+
+    <div class="nav-section-label">Reportes</div>
+    <a th:href="@{/reportes}" class="nav-item" th:classappend="${activePage == 'reportes'} ? ' active' : ''">
+      <span class="icon"><i class="fa-solid fa-chart-line"></i></span>
+      <span class="nav-text">Ventas</span>
+    </a>
+    <a th:href="@{/reportes/lavados}" class="nav-item" th:classappend="${activePage == 'reportes-lavados'} ? ' active' : ''">
+      <span class="icon"><i class="fa-solid fa-chart-bar"></i></span>
+      <span class="nav-text">Lavados</span>
+    </a>
+    <a th:href="@{/reportes/estadisticas}" class="nav-item" th:classappend="${activePage == 'reportes-estadisticas'} ? ' active' : ''">
+      <span class="icon"><i class="fa-solid fa-chart-pie"></i></span>
+      <span class="nav-text">Estadísticas</span>
+    </a>
+
+    <div class="nav-section-label">Inventario</div>
+    <a th:href="@{/productos/stock-bajo}" class="nav-item" th:classappend="${activePage == 'stock-bajo'} ? ' active' : ''">
+      <span class="icon"><i class="fa-solid fa-triangle-exclamation"></i></span>
+      <span class="nav-text">Alerta de Stock</span>
+      <span th:if="${bajoStock != null && bajoStock.size() > 0}"
+            class="stock-badge" th:text="${bajoStock.size()}"></span>
+    </a>
+
+    <div class="nav-section-label">Configuración</div>
+    <a th:href="@{/usuarios}" class="nav-item" sec:authorize="hasAuthority('ADMIN')"
+       th:classappend="${activePage == 'usuarios'} ? ' active' : ''">
+      <span class="icon"><i class="fa-solid fa-user-gear"></i></span>
+      <span class="nav-text">Usuarios</span>
+    </a>
+    <a th:href="@{/configuracion}" class="nav-item" th:classappend="${activePage == 'configuracion'} ? ' active' : ''">
+      <span class="icon"><i class="fa-solid fa-cog"></i></span>
+      <span class="nav-text">Configuración</span>
+    </a>
+    <a th:href="@{/sunat}" class="nav-item" th:classappend="${activePage == 'sunat'} ? ' active' : ''">
+      <span class="icon"><i class="fa-solid fa-file-invoice"></i></span>
+      <span class="nav-text">SUNAT</span>
+    </a>
+
+    <div class="nav-section-label">Cuenta</div>
+    <a th:href="@{/logout}" class="nav-item">
+      <span class="icon"><i class="fa-solid fa-right-from-bracket"></i></span>
+      <span class="nav-text">Cerrar sesión</span>
+    </a>
+  </nav>
+
+  <div class="sidebar-footer">
+    <div class="user-card">
+      <div class="user-avatar">
+        <span th:text="${#strings.substring(#authentication.name,0,1).toUpperCase()}">U</span>
+      </div>
+      <div class="user-info">
+        <div class="user-name" sec:authentication="name">Usuario</div>
+        <div class="user-role">
+          <span sec:authorize="hasAuthority('ADMIN')">Administrador</span>
+          <span sec:authorize="hasAuthority('CAJERO')">Cajero</span>
+          <span sec:authorize="hasAuthority('LAVADOR')">Lavador</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</aside>
+
+<!-- ══ MAIN ════════════════════════════════════════════ -->
+<div class="main-content" id="mainContent">
+  <header class="topbar">
+    <div class="topbar-left">
+      <button class="menu-toggle" id="menuToggle" title="Contraer menú">
+        <i class="fa-solid fa-bars"></i>
+      </button>
+      <div class="topbar-title-block">
+        <div class="page-title" layout:fragment="page-title">Dashboard</div>
+        <div class="topbar-clock">
+          <span class="live-dot"></span>
+          <span id="currentDate"></span>
+          <span style="color:var(--border-mid)">·</span>
+          <span class="clock-display" id="currentTime"></span>
+        </div>
+      </div>
+    </div>
+
+    <div class="topbar-right">
+      <div class="notif-wrapper">
+        <button class="tb-btn" id="btnCampana" title="Notificaciones">
+          <i class="fa-regular fa-bell"></i>
+        </button>
+        <div class="notif-badge" id="notifBadge"></div>
+        <div class="notif-panel" id="notifPanel">
+          <div class="notif-head">
+            <div class="notif-head-title"><i class="fa-solid fa-bell"></i> Notificaciones</div>
+            <span class="notif-head-count" id="notifCount"></span>
+          </div>
+          <div class="notif-list" id="notifList">
+            <div class="notif-empty"><i class="fa-regular fa-bell"></i>Cargando…</div>
+          </div>
+        </div>
+      </div>
+
+      <a th:href="@{/configuracion}" class="tb-btn" title="Configuración">
+        <i class="fa-solid fa-gear"></i>
+      </a>
+      <a th:href="@{/logout}" class="tb-btn danger" title="Cerrar sesión">
+        <i class="fa-solid fa-right-from-bracket"></i>
+      </a>
+    </div>
+  </header>
+
+  <div class="page-body">
+    <div layout:fragment="content"></div>
+  </div>
+</div>
+
+<script>
+  /* ─────────────────────────────────────────────────────────────────
+     CLOCK - RELOJ EN TIEMPO REAL
+  ───────────────────────────────────────────────────────────────── */
+  function tick() {
+    const n = new Date();
+    const days   = ['Dom','Lun','Mar','Mié','Jue','Vie','Sáb'];
+    const months = ['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+    const ed = document.getElementById('currentDate');
+    if (ed) ed.textContent = days[n.getDay()] + ' ' + n.getDate() + ' ' + months[n.getMonth()];
+    const et = document.getElementById('currentTime');
+    if (et) {
+      let h = n.getHours(), m = String(n.getMinutes()).padStart(2,'0'),
+          s = String(n.getSeconds()).padStart(2,'0');
+      const ap = h >= 12 ? 'PM' : 'AM';
+      h = String(h % 12 || 12).padStart(2,'0');
+      et.textContent = h + ':' + m + ':' + s + ' ' + ap;
+    }
+  }
+  tick(); setInterval(tick, 1000);
+
+  /* ─────────────────────────────────────────────────────────────────
+     SIDEBAR COMPACT
+  ───────────────────────────────────────────────────────────────── */
+  const sidebar = document.getElementById('sidebar');
+  const menuToggle = document.getElementById('menuToggle');
+  if (menuToggle) {
+    menuToggle.addEventListener('click', function () {
+      sidebar.classList.toggle('compact');
+      localStorage.setItem('compact', sidebar.classList.contains('compact') ? '1' : '0');
+    });
+  }
+  if (localStorage.getItem('compact') === '1') sidebar.classList.add('compact');
+
+  /* ─────────────────────────────────────────────────────────────────
+     AUDIO NOTIFICACIONES
+  ───────────────────────────────────────────────────────────────── */
+  let audioCtx = null, audioOn = false, prevCount = -1;
+  if (localStorage.getItem('audioActivado') === '1') {
+    const audioBtn = document.getElementById('audioActivador');
+    if (audioBtn) audioBtn.classList.add('oculto');
+    audioOn = true;
+  }
+  function activarAudio() {
+    try {
+      audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      playTone(1100, 1400, 1100);
+      audioOn = true;
+      localStorage.setItem('audioActivado','1');
+      const audioBtn = document.getElementById('audioActivador');
+      if (audioBtn) audioBtn.classList.add('oculto');
+    } catch(e) {}
+  }
+  function playTone(f1,f2,f3) {
+    if (!audioOn) return;
+    try {
+      if (!audioCtx) audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+      const o = audioCtx.createOscillator(), g = audioCtx.createGain();
+      o.connect(g); g.connect(audioCtx.destination);
+      o.type='sine';
+      const t = audioCtx.currentTime;
+      o.frequency.setValueAtTime(f1,t);
+      o.frequency.setValueAtTime(f2,t+.12);
+      o.frequency.setValueAtTime(f3,t+.24);
+      g.gain.setValueAtTime(.25,t);
+      g.gain.exponentialRampToValueAtTime(.001,t+.6);
+      o.start(t); o.stop(t+.6);
+    } catch(e) {}
+  }
+
+  /* ─────────────────────────────────────────────────────────────────
+     NOTIFICACIONES
+  ───────────────────────────────────────────────────────────────── */
+  async function cargarNotificaciones() {
+    try {
+      const res = await fetch('/api/notificaciones');
+      const data = await res.json();
+      const badge = document.getElementById('notifBadge');
+      const count = document.getElementById('notifCount');
+      const lista = document.getElementById('notifList');
+      if (data.total > 0) {
+        badge.textContent = data.total > 9 ? '9+' : data.total;
+        badge.classList.add('show');
+        count.textContent = data.total + ' alertas';
+        if (prevCount >= 0 && data.total > prevCount) playTone(880,1100,880);
+      } else {
+        badge.classList.remove('show');
+        count.textContent = 'Todo en orden';
+      }
+      prevCount = data.total;
+      if (!data.notificaciones || data.notificaciones.length === 0) {
+        lista.innerHTML = `<div class="notif-empty">
+          <i class="fa-solid fa-circle-check" style="color:var(--green);opacity:1;"></i>
+          Todo está en orden</div>`;
+        return;
+      }
+      lista.innerHTML = data.notificaciones.map(n => `
+        <a href="${n.url}" class="notif-item">
+          <div class="notif-icon ${n.tipo}"><i class="fa-solid ${n.icono}"></i></div>
+          <div>
+            <div class="notif-titulo">${n.titulo}</div>
+            <div class="notif-mensaje">${n.mensaje}</div>
+          </div>
+        </a>`).join('');
+    } catch(e) { console.error(e); }
+  }
+  
+  function toggleNotif(e) {
+    e.stopPropagation();
+    const p = document.getElementById('notifPanel');
+    p.classList.toggle('open');
+    if (p.classList.contains('open')) cargarNotificaciones();
+  }
+  
+  const btnCampana = document.getElementById('btnCampana');
+  if (btnCampana) btnCampana.addEventListener('click', toggleNotif);
+  
+  document.addEventListener('click', function(e) {
+    const p = document.getElementById('notifPanel');
+    const btn = document.getElementById('btnCampana');
+    if (p && btn && !p.contains(e.target) && e.target !== btn) {
+      p.classList.remove('open');
+    }
+  });
+  
+  cargarNotificaciones();
+  setInterval(cargarNotificaciones, 60000);
+
+  /* ─────────────────────────────────────────────────────────────────
+     APLICAR TEMA Y COLORES DESDE COOKIES (PERSONALIZACIÓN)
+  ───────────────────────────────────────────────────────────────── */
+  (function() {
+    function getCookie(name) {
+      const value = `; ${document.cookie}`;
+      const parts = value.split(`; ${name}=`);
+      if (parts.length === 2) return parts.pop().split(';').shift();
+      return null;
+    }
+
+    function aplicarPersonalizacion() {
+      try {
+        const tema = getCookie('tema');
+        const colorPrimario = getCookie('colorPrimario');
+        const colorSecundario = getCookie('colorSecundario');
+        const tamanioTexto = getCookie('tamanioTexto');
+        
+        // Aplicar tema (modo oscuro/claro)
+        if (tema === 'oscuro') {
+          document.body.classList.add('dark-theme');
+        } else if (tema === 'claro') {
+          document.body.classList.remove('dark-theme');
+        } else if (tema === 'auto') {
+          if (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+            document.body.classList.add('dark-theme');
+          } else {
+            document.body.classList.remove('dark-theme');
+          }
+        }
+        
+        // Aplicar colores personalizados
+        if (colorPrimario && colorPrimario !== 'undefined' && colorPrimario !== 'null') {
+          const hexColor = '#' + colorPrimario;
+          document.documentElement.style.setProperty('--accent', hexColor);
+          document.documentElement.style.setProperty('--accent-dark', hexColor);
+          
+          const r = parseInt(hexColor.slice(1,3), 16);
+          const g = parseInt(hexColor.slice(3,5), 16);
+          const b = parseInt(hexColor.slice(5,7), 16);
+          document.documentElement.style.setProperty('--accent-glow', `rgba(${r}, ${g}, ${b}, 0.15)`);
+          document.documentElement.style.setProperty('--accent-light', `rgba(${r}, ${g}, ${b}, 0.08)`);
+        }
+        
+        if (colorSecundario && colorSecundario !== 'undefined' && colorSecundario !== 'null') {
+          const hexSecundario = '#' + colorSecundario;
+          document.documentElement.style.setProperty('--sidebar-bg', hexSecundario);
+          document.documentElement.style.setProperty('--sidebar-hover', hexSecundario + 'cc');
+          document.documentElement.style.setProperty('--sidebar-active', hexSecundario);
+        }
+        
+        // Aplicar tamaño de texto
+        if (tamanioTexto === 'pequeño') {
+          document.documentElement.style.setProperty('--font-body-size', '12px');
+          document.documentElement.style.fontSize = '12px';
+        } else if (tamanioTexto === 'grande') {
+          document.documentElement.style.setProperty('--font-body-size', '16px');
+          document.documentElement.style.fontSize = '16px';
+        } else {
+          document.documentElement.style.setProperty('--font-body-size', '14px');
+          document.documentElement.style.fontSize = '14px';
+        }
+      } catch(e) {
+        console.log('Error al aplicar personalización:', e);
+      }
+    }
+    
+    if (window.matchMedia) {
+      window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function() {
+        const tema = getCookie('tema');
+        if (tema === 'auto') aplicarPersonalizacion();
+      });
+    }
+    
+    aplicarPersonalizacion();
+  })();
+</script>
+
+<th:block layout:fragment="scripts"></th:block>
+</body>
+</html>

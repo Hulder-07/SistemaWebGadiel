@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Detalle Cliente</title></head>
+<body>
+<th:block layout:fragment="page-title">Detalle Cliente</th:block>
+<th:block layout:fragment="content">
+<div style="max-width:720px;">
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-header">
+      <div class="card-title"><div class="dot"></div><span th:text="${cliente.nombre}"></span></div>
+      <a th:href="@{/clientes/editar/{id}(id=${cliente.id})}" class="btn btn-sm btn-outline">
+        <i class="fa-solid fa-pen"></i> Editar
+      </a>
+    </div>
+    <div style="padding:20px 24px;display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+      <div><div class="form-label">DNI</div><div th:text="${cliente.dni}?:'-'"></div></div>
+      <div><div class="form-label">Teléfono</div><div th:text="${cliente.telefono}?:'-'"></div></div>
+      <div><div class="form-label">Email</div><div th:text="${cliente.email}?:'-'"></div></div>
+      <div><div class="form-label">Dirección</div><div th:text="${cliente.direccion}?:'-'"></div></div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><div class="dot"></div>Vehículos registrados</div>
+      <a th:href="@{/vehiculos/nuevo}" class="card-action">+ Agregar vehículo</a>
+    </div>
+    <table>
+      <thead><tr><th>Placa</th><th>Marca</th><th>Modelo</th><th>Color</th><th>Tipo</th></tr></thead>
+      <tbody>
+        <tr th:each="v : ${vehiculos}">
+          <td><strong th:text="${v.placa}"></strong></td>
+          <td th:text="${v.marca}"></td>
+          <td th:text="${v.modelo}"></td>
+          <td th:text="${v.color}"></td>
+          <td th:text="${v.tipo}"></td>
+        </tr>
+        <tr th:if="${#lists.isEmpty(vehiculos)}">
+          <td colspan="5" style="text-align:center;padding:20px;color:var(--text-muted);">Sin vehículos registrados</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div style="margin-top:16px;">
+    <a th:href="@{/clientes}" class="btn btn-outline">← Volver</a>
+  </div>
+</div>
+</th:block>
+</body>
+</html>

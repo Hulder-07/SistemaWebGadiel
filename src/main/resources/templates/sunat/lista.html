@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>SUNAT</title></head>
+<body>
+<div layout:fragment="page-title">Comprobantes SUNAT</div>
+<div layout:fragment="content">
+
+<div th:if="${msg}"   class="alert-box success" th:text="${msg}"></div>
+<div th:if="${error}" class="alert-box danger"  th:text="${error}"></div>
+
+<div class="d-flex justify-between align-center mb-3">
+  <div style="font-size:13px;color:var(--text-muted);">Últimos 20 comprobantes emitidos</div>
+  <a th:href="@{/ordenes}" class="btn btn-outline btn-sm"><i class="fa-solid fa-arrow-left"></i> Volver a Órdenes</a>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="card-title"><div class="dot"></div>Comprobantes Electrónicos</div>
+  </div>
+  <table>
+    <thead>
+      <tr><th>Tipo</th><th>N°</th><th>Cliente</th><th>Documento</th><th>Total</th><th>Estado</th><th>Fecha</th><th>PDF</th></tr>
+    </thead>
+    <tbody>
+      <tr th:each="c : ${comprobantes}">
+        <td>
+          <span class="badge" th:classappend="${c.tipoComprobante=='BOLETA'}?'badge-info':'badge-warning'"
+                th:text="${c.tipoComprobante}"></span>
+        </td>
+        <td><code th:text="${c.numeroCompleto!=null?c.numeroCompleto:'-'}"></code></td>
+        <td th:text="${c.clienteNombre}"></td>
+        <td th:text="${c.clienteDocumento}"></td>
+        <td th:text="'S/ '+${#numbers.formatDecimal(c.total,1,'COMMA',2,'POINT')}"></td>
+        <td>
+          <span class="badge"
+                th:classappend="${c.estado=='ACEPTADO'}?'badge-completado':(${c.estado=='ERROR'}?'badge-cancelado':'badge-pendiente')"
+                th:text="${c.estado}"></span>
+        </td>
+        <td th:text="${#temporals.format(c.fechaEmision,'dd/MM/yyyy HH:mm')}"></td>
+        <td>
+          <a th:if="${c.urlPdf!=null and !c.urlPdf.isEmpty()}" th:href="${c.urlPdf}"
+             class="btn btn-danger btn-xs" target="_blank"><i class="fa-solid fa-file-pdf"></i> PDF</a>
+          <span th:if="${c.urlPdf==null or c.urlPdf.isEmpty()}" style="color:var(--text-muted);font-size:12px;">-</span>
+        </td>
+      </tr>
+      <tr th:if="${comprobantes.isEmpty()}">
+        <td colspan="8" class="empty-state-sm">No hay comprobantes emitidos aún.</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</th:block>
+</body>
+</html>

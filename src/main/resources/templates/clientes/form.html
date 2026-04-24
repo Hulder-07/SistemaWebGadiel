@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Cliente</title>
+    <style>
+        .reniec-btn {
+            height: 38px;
+            white-space: nowrap;
+        }
+        
+        .loading {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        
+        .auto-filled {
+            background-color: #d4edda !important;
+            border-color: #28a745 !important;
+        }
+        
+        .reniec-alert {
+            padding: 12px;
+            border-radius: 8px;
+            margin-bottom: 16px;
+            display: none;
+        }
+        
+        .reniec-alert.success {
+            background-color: #d4edda;
+            border: 1px solid #c3e6cb;
+            color: #155724;
+        }
+        
+        .reniec-alert.error {
+            background-color: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+<th:block layout:fragment="page-title" th:text="${cliente.id!=null}?'Editar Cliente':'Nuevo Cliente'">Cliente</th:block>
+<th:block layout:fragment="content">
+<div style="max-width:660px;">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="dot"></div>
+        <span th:text="${cliente.id!=null}?'Editar Cliente':'Nuevo Cliente'"></span>
+      </div>
+    </div>
+    <div style="padding:24px;">
+      
+      <!-- Alerta de RENIEC -->
+      <div id="reniecAlert" class="reniec-alert"></div>
+      
+      <form method="post" th:action="@{/clientes/guardar}" th:object="${cliente}">
+        <input type="hidden" th:field="*{id}"/>
+        <input type="hidden" th:field="*{activo}" value="true"/>
+        
+        <!-- DNI con búsqueda RENIEC -->
+        <div class="form-group">
+          <label class="form-label">🆔 DNI *</label>
+          <div style="display:flex;gap:8px;">
+            <input type="text" 
+                   th:field="*{dni}" 
+                   id="dni"
+                   class="form-control" 
+                   maxlength="8" 
+                   pattern="\d{8}"
+                   placeholder="12345678"
+                   required
+                   style="flex:1;"/>
+            <button type="button" 
+                    id="btnBuscarReniec"
+                    class="btn btn-primary reniec-btn">
+              <i class="fas fa-search"></i> Buscar en RENIEC
+            </button>
+          </div>
+          <small style="color:#6c757d;font-size:0.875rem;">Ingrese 8 dígitos y haga clic en Buscar</small>
+        </div>
+
+        <!-- Nombres -->
+        <div class="form-group">
+          <label class="form-label">👤 Nombres *</label>
+          <input type="text" 
+                 th:field="*{nombres}" 
+                 id="nombres"
+                 class="form-control" 
+                 placeholder="Ej: JUAN CARLOS"
+                 required/>
+        </div>
+
+        <!-- Apellidos en grid -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group">
+            <label class="form-label">Apellido Paterno *</label>
+            <input type="text" 
+                   th:field="*{apellidoPaterno}" 
+                   id="apellidoPaterno"
+                   class="form-control" 
+                   placeholder="Ej: PEREZ"
+                   required/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Apellido Materno *</label>
+            <input type="text" 
+                   th:field="*{apellidoMaterno}" 
+                   id="apellidoMaterno"
+                   class="form-control" 
+                   placeholder="Ej: GARCIA"
+                   required/>
+          </div>
+        </div>
+
+        <!-- Teléfono y Email -->
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group">
+            <label class="form-label">📱 Teléfono</label>
+            <input type="text" 
+                   th:field="*{telefono}" 
+                   class="form-control" 
+                   placeholder="999123456"
+                   maxlength="15"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">📧 Email</label>
+            <input type="email" 
+                   th:field="*{email}" 
+                   class="form-control" 
+                   placeholder="correo@ejemplo.com"/>
+          </div>
+        </div>
+
+        <!-- Dirección -->
+        <div class="form-group">
+          <label class="form-label">🏠 Dirección</label>
+          <input type="text" 
+                 th:field="*{direccion}" 
+                 class="form-control" 
+                 placeholder="Jr. Ejemplo 123"/>
+        </div>
+
+        <!-- Botones -->
+        <div style="display:flex;gap:12px;margin-top:8px;">
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar
+          </button>
+          <a th:href="@{/clientes}" class="btn btn-outline">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const btnBuscar = document.getElementById('btnBuscarReniec');
+    const dniInput = document.getElementById('dni');
+    const nombresInput = document.getElementById('nombres');
+    const apPaternoInput = document.getElementById('apellidoPaterno');
+    const apMaternoInput = document.getElementById('apellidoMaterno');
+    const alertDiv = document.getElementById('reniecAlert');
+
+    // Función para mostrar alertas
+    function mostrarAlerta(mensaje, tipo) {
+        alertDiv.textContent = mensaje;
+        alertDiv.className = 'reniec-alert ' + tipo;
+        alertDiv.style.display = 'block';
+        
+        // Ocultar después de 5 segundos si es éxito
+        if (tipo === 'success') {
+            setTimeout(() => {
+                alertDiv.style.display = 'none';
+            }, 5000);
+        }
+    }
+
+    // Función para limpiar campos
+    function limpiarCampos() {
+        nombresInput.value = '';
+        apPaternoInput.value = '';
+        apMaternoInput.value = '';
+        
+        nombresInput.classList.remove('auto-filled');
+        apPaternoInput.classList.remove('auto-filled');
+        apMaternoInput.classList.remove('auto-filled');
+    }
+
+    // Evento de búsqueda
+    btnBuscar.addEventListener('click', function() {
+        const dni = dniInput.value.trim();
+        
+        // Validar DNI
+        if (dni.length !== 8 || !/^\d+$/.test(dni)) {
+            mostrarAlerta('❌ Ingrese un DNI válido de 8 dígitos numéricos', 'error');
+            dniInput.focus();
+            return;
+        }
+        
+        // Deshabilitar botón y mostrar loading
+        btnBuscar.disabled = true;
+        btnBuscar.classList.add('loading');
+        btnBuscar.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...';
+        alertDiv.style.display = 'none';
+        
+        // Limpiar campos antes de buscar
+        limpiarCampos();
+        
+        // Llamar a la API
+        fetch('/clientes/api/consultar-dni/' + dni)
+            .then(response => {
+                if (!response.ok) {
+                    return response.json().then(err => {
+                        throw new Error(err.error || 'DNI no encontrado en RENIEC');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                if (data.error) {
+                    throw new Error(data.error);
+                }
+                
+                // Autocompletar campos
+                nombresInput.value = data.nombres || '';
+                apPaternoInput.value = data.apellidoPaterno || '';
+                apMaternoInput.value = data.apellidoMaterno || '';
+                
+                // Marcar campos como autocompletados
+                nombresInput.classList.add('auto-filled');
+                apPaternoInput.classList.add('auto-filled');
+                apMaternoInput.classList.add('auto-filled');
+                
+                // Mostrar mensaje de éxito
+                const nombreCompleto = [data.nombres, data.apellidoPaterno, data.apellidoMaterno]
+                    .filter(Boolean)
+                    .join(' ');
+                    
+                mostrarAlerta('✅ Datos encontrados: ' + nombreCompleto, 'success');
+                
+                // Enfocar el siguiente campo (teléfono)
+                setTimeout(() => {
+                    document.querySelector('input[name="telefono"]').focus();
+                }, 500);
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                mostrarAlerta('❌ ' + error.message, 'error');
+            })
+            .finally(() => {
+                // Restaurar botón
+                btnBuscar.disabled = false;
+                btnBuscar.classList.remove('loading');
+                btnBuscar.innerHTML = '<i class="fas fa-search"></i> Buscar en RENIEC';
+            });
+    });
+
+    // Permitir buscar con Enter en el campo DNI
+    dniInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            e.preventDefault();
+            btnBuscar.click();
+        }
+    });
+
+    // Limpiar campos si se cambia el DNI manualmente
+    dniInput.addEventListener('input', function() {
+        if (this.value.length < 8) {
+            limpiarCampos();
+            alertDiv.style.display = 'none';
+        }
+    });
+});
+</script>
+
+</th:block>
+</body>
+</html>

@@ -1,0 +1,261 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Estadísticas</title>
+</head>
+<body>
+    <div layout:fragment="content">
+        <div class="d-flex justify-between align-center mb-3">
+    <div style="font-size:20px;font-weight:800;color:var(--text-primary);font-family:var(--font-display);letter-spacing:-.4px;">Estadísticas del Negocio</div>
+            <div class="d-flex gap-2">
+                <a th:href="@{/reportes/pdf/ordenes(periodo='mensual')}" class="btn btn-outline btn-sm" target="_blank">
+                    <i class="fa-solid fa-file-pdf"></i> PDF
+                </a>
+                <a th:href="@{/reportes/excel/ordenes(periodo='mensual')}" class="btn btn-outline btn-sm">
+                    <i class="fa-solid fa-file-excel"></i> Excel
+                </a>
+                <a href="/reportes" class="btn btn-outline btn-sm">
+                    <i class="fa-solid fa-arrow-left"></i> Volver
+                </a>
+            </div>
+        </div>
+
+        <!-- KPIs principales -->
+        <div class="stats-grid" style="grid-template-columns:repeat(3,1fr); margin-bottom:24px;">
+            <div class="stat-card">
+                <div class="stat-icon purple"><i class="fa-solid fa-chart-line"></i></div>
+                <div>
+                    <div class="stat-value" th:text="'S/ ' + ${#numbers.formatDecimal(ingresosTotalesMes, 1, 2)}">S/0.00</div>
+                    <div class="stat-label">Ingresos Totales del Mes</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon blue"><i class="fa-solid fa-car-wash"></i></div>
+                <div>
+                    <div class="stat-value" th:text="'S/ ' + ${#numbers.formatDecimal(ingresosLavadosMes, 1, 2)}">S/0.00</div>
+                    <div class="stat-label">Lavados del Mes</div>
+                </div>
+            </div>
+            <div class="stat-card">
+                <div class="stat-icon green"><i class="fa-solid fa-store"></i></div>
+                <div>
+                    <div class="stat-value" th:text="'S/ ' + ${#numbers.formatDecimal(ingresosTiendaMes, 1, 2)}">S/0.00</div>
+                    <div class="stat-label">Tienda del Mes</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Gráfico de ingresos (Últimos 7 días) -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="dot"></span> Tendencia de Ingresos (Últimos 7 Días)
+                </div>
+            </div>
+            <div class="card-body" style="padding:20px;">
+                <canvas id="ingresosChart" style="width: 100%; height: 300px;"></canvas>
+            </div>
+        </div>
+
+        <!-- Comparativa semanal -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="dot"></span> Comparativa Semanal
+                </div>
+            </div>
+            <div class="card-body" style="padding:20px;">
+                <div style="display:flex; align-items:center; gap:40px; flex-wrap:wrap;">
+                    <div>
+                        <div style="font-size:13px; color:var(--text-muted);">Semana Actual</div>
+                        <div style="font-size:28px; font-weight:800;" 
+                             th:text="'S/ ' + ${#numbers.formatDecimal(ingresosSemanaActual, 1, 2)}">S/0.00</div>
+                    </div>
+                    <div>
+                        <div style="font-size:13px; color:var(--text-muted);">Semana Anterior</div>
+                        <div style="font-size:20px; font-weight:600;" 
+                             th:text="'S/ ' + ${#numbers.formatDecimal(ingresosSemanaAnterior, 1, 2)}">S/0.00</div>
+                    </div>
+                    <div>
+                        <div style="font-size:13px; color:var(--text-muted);">Variación</div>
+                        <div style="font-size:24px; font-weight:800;" 
+                             th:class="${variacionSemanal >= 0} ? 'text-success' : 'text-danger'">
+                            <span th:text="${variacionSemanal >= 0 ? '+' : ''}"></span>
+                            <span th:text="${#numbers.formatDecimal(variacionSemanal, 1, 2)}">0.00</span>%
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Distribución de ingresos -->
+        <div class="card mb-3">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="dot"></span> Distribución de Ingresos
+                </div>
+            </div>
+            <div class="card-body" style="padding:20px;">
+                <div style="display:flex; flex-direction:column; gap:20px;">
+                    <div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                            <span><i class="fa-solid fa-car-wash" style="color:var(--accent);"></i> Lavados</span>
+                            <span class="fw-bold" th:text="'S/ ' + ${#numbers.formatDecimal(ingresosLavadosMes, 1, 2)}">S/0.00</span>
+                        </div>
+                        <div class="top-bar-bg">
+                            <div class="top-bar-fill" 
+                                 th:style="'width:' + (${ingresosTotalesMes > 0} 
+                                    ? (${ingresosLavadosMes * 100 / ingresosTotalesMes} + '%') 
+                                    : '0%')"></div>
+                        </div>
+                        <div class="text-right text-muted" style="margin-top:4px; font-size:11px;"
+                             th:text="${ingresosTotalesMes > 0 
+                                ? #numbers.formatDecimal(ingresosLavadosMes * 100 / ingresosTotalesMes, 1, 2) + '% del total'
+                                : '0% del total'}">
+                        </div>
+                    </div>
+                    <div>
+                        <div style="display:flex; justify-content:space-between; margin-bottom:8px;">
+                            <span><i class="fa-solid fa-store" style="color:var(--warning);"></i> Tienda</span>
+                            <span class="fw-bold" th:text="'S/ ' + ${#numbers.formatDecimal(ingresosTiendaMes, 1, 2)}">S/0.00</span>
+                        </div>
+                        <div class="top-bar-bg">
+                            <div class="top-bar-fill" 
+                                 style="background:var(--warning);"
+                                 th:style="'background:var(--warning); width:' + (${ingresosTotalesMes > 0} 
+                                    ? (${ingresosTiendaMes * 100 / ingresosTotalesMes} + '%') 
+                                    : '0%')"></div>
+                        </div>
+                        <div class="text-right text-muted" style="margin-top:4px; font-size:11px;"
+                             th:text="${ingresosTotalesMes > 0 
+                                ? #numbers.formatDecimal(ingresosTiendaMes * 100 / ingresosTotalesMes, 1, 2) + '% del total'
+                                : '0% del total'}">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Resumen rápido -->
+        <div class="card mt-3">
+            <div class="card-header">
+                <div class="card-title">
+                    <span class="dot"></span> Resumen del Mes
+                </div>
+            </div>
+            <div class="card-body" style="padding:20px;">
+                <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px;">
+                    <div>
+                        <div class="text-muted" style="font-size:12px;">Total Lavados</div>
+                        <div class="fw-bold" style="font-size:18px;" th:text="${ingresosLavadosMes > 0 ? 'S/ ' + #numbers.formatDecimal(ingresosLavadosMes, 1, 2) : 'S/ 0.00'}">S/0.00</div>
+                    </div>
+                    <div>
+                        <div class="text-muted" style="font-size:12px;">Total Tienda</div>
+                        <div class="fw-bold" style="font-size:18px;" th:text="${ingresosTiendaMes > 0 ? 'S/ ' + #numbers.formatDecimal(ingresosTiendaMes, 1, 2) : 'S/ 0.00'}">S/0.00</div>
+                    </div>
+                    <div>
+                        <div class="text-muted" style="font-size:12px;">Promedio Diario</div>
+                        <div class="fw-bold" style="font-size:18px;" th:text="'S/ ' + ${#numbers.formatDecimal(ingresosTotalesMes / 30, 1, 2)}">S/0.00</div>
+                    </div>
+                    <div>
+                        <div class="text-muted" style="font-size:12px;">Proyección Mensual</div>
+                        <div class="fw-bold" style="font-size:18px; color:var(--success);" 
+                             th:text="'S/ ' + ${#numbers.formatDecimal(ingresosTotalesMes * 1.1, 1, 2)}">S/0.00</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <script th:inline="javascript">
+            document.addEventListener('DOMContentLoaded', function() {
+                var labelsFechas = /*[[${labelsFechas}]]*/ [];
+                var lavadosData = /*[[${lavadosData}]]*/ [];
+                var tiendaData = /*[[${tiendaData}]]*/ [];
+
+                var ctx = document.getElementById('ingresosChart').getContext('2d');
+                var myChart = new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: labelsFechas,
+                        datasets: [
+                            {
+                                label: 'Lavados',
+                                data: lavadosData,
+                                backgroundColor: 'rgba(255, 18, 18, 0.15)',
+                                borderColor: 'rgba(255, 18, 18, 1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#ffffff',
+                                pointBorderColor: 'rgba(255, 18, 18, 1)',
+                                pointBorderWidth: 2,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            },
+                            {
+                                label: 'Tienda',
+                                data: tiendaData,
+                                backgroundColor: 'rgba(180, 83, 9, 0.15)',
+                                borderColor: 'rgba(180, 83, 9, 1)',
+                                borderWidth: 2,
+                                fill: true,
+                                tension: 0.4,
+                                pointBackgroundColor: '#ffffff',
+                                pointBorderColor: 'rgba(180, 83, 9, 1)',
+                                pointBorderWidth: 2,
+                                pointRadius: 4,
+                                pointHoverRadius: 6
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: {
+                            mode: 'index',
+                            intersect: false,
+                        },
+                        scales: {
+                            x: {
+                                grid: {
+                                    display: false
+                                }
+                            },
+                            y: {
+                                beginAtZero: true,
+                                border: { dash: [4, 4] },
+                                grid: {
+                                    color: 'rgba(0, 0, 0, 0.05)'
+                                },
+                                ticks: {
+                                    callback: function(value) {
+                                        return 'S/ ' + value;
+                                    }
+                                }
+                            }
+                        },
+                        plugins: {
+                            tooltip: {
+                                callbacks: {
+                                    label: function(context) {
+                                        let label = context.dataset.label || '';
+                                        if (label) {
+                                            label += ': ';
+                                        }
+                                        if (context.parsed.y !== null) {
+                                            label += 'S/ ' + context.parsed.y.toFixed(2);
+                                        }
+                                        return label;
+                                    }
+                                }
+                            }
+                        }
+                    }
+                });
+            });
+        </script>
+    </div>
+</body>
+</html>

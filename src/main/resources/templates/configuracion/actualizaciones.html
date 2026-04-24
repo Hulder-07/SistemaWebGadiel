@@ -1,0 +1,299 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Actualizaciones - Configuración</title>
+</head>
+<body>
+<th:block layout:fragment="page-title">Actualizaciones</th:block>
+<th:block layout:fragment="content">
+
+<div style="max-width: 900px; margin: 0 auto;">
+    
+    <!-- Breadcrumb -->
+    <nav style="margin-bottom: 2rem;">
+        <a th:href="@{/configuracion}" style="color: #6b7280; text-decoration: none;">
+            <i class="fas fa-arrow-left"></i> Configuración
+        </a>
+        <span style="color: #6b7280; margin: 0 0.5rem;">/</span>
+        <span>Actualizaciones</span>
+    </nav>
+
+    <!-- Versión Actual -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <div style="padding: 2rem;">
+            <div style="display: flex; align-items: center; gap: 2rem;">
+                <div style="width: 80px; height: 80px; background: linear-gradient(135deg, #dc2626, #991b1b); border-radius: 20px; display: flex; align-items: center; justify-content: center; flex-shrink: 0;">
+                    <i class="fas fa-code-branch" style="font-size: 2.5rem; color: white;"></i>
+                </div>
+                <div style="flex: 1;">
+                    <h2 style="margin: 0 0 0.5rem; font-size: 1.5rem;">Sistema CarWash Gadiel</h2>
+                    <p style="margin: 0; color: #6b7280;">
+                        Versión <strong th:text="${config?.version ?: '1.0.0'}">1.0.0</strong>
+                    </p>
+                    <p style="margin: 0.25rem 0 0; font-size: 0.875rem; color: #9ca3af;">
+                        Última actualización: 
+                        <span th:text="${config?.fechaActualizacion != null ? #temporals.format(config.fechaActualizacion, 'dd/MM/yyyy') : '21/03/2026'}">
+                            21/03/2026
+                        </span>
+                    </p>
+                </div>
+                <span class="badge bg-success" style="font-size: 0.875rem; padding: 0.5rem 1rem;">
+                    ✓ Actualizado
+                </span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Buscar Actualizaciones -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-header">
+            <div class="card-title">
+                <div class="dot"></div>
+                <span>Buscar Actualizaciones</span>
+            </div>
+        </div>
+        
+        <div style="padding: 2rem; text-align: center;">
+            <i class="fas fa-sync-alt" style="font-size: 3rem; color: #e5e7eb; margin-bottom: 1rem;"></i>
+            <p style="margin: 0 0 1.5rem; color: #6b7280;">
+                Tu sistema está actualizado con la última versión disponible
+            </p>
+            <button type="button" class="btn btn-primary" onclick="buscarActualizaciones()">
+                <i class="fas fa-search"></i> Buscar Actualizaciones
+            </button>
+        </div>
+    </div>
+
+    <!-- Historial de Versiones -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-header">
+            <div class="card-title">
+                <div class="dot"></div>
+                <span>Historial de Versiones</span>
+            </div>
+        </div>
+        
+        <div style="padding: 2rem;">
+            
+            <!-- Versión 1.0.0 -->
+            <div class="version-item">
+                <div class="version-header">
+                    <div>
+                        <h4>Versión 1.0.0</h4>
+                        <p>21 de Marzo, 2026</p>
+                    </div>
+                    <span class="badge bg-success">Actual</span>
+                </div>
+                <div class="version-content">
+                    <h5>✨ Nuevas Funcionalidades</h5>
+                    <ul>
+                        <li>🚗 Módulo de Caja Lavadero completo</li>
+                        <li>🆔 Integración con RENIEC (API Perú)</li>
+                        <li>🧾 Facturación electrónica SUNAT/NubeFact</li>
+                        <li>👥 Gestión de clientes, servicios y productos</li>
+                        <li>📊 Dashboard con estadísticas en tiempo real</li>
+                        <li>💾 Sistema de backup y restauración</li>
+                        <li>⚙️ Panel de configuración completo</li>
+                    </ul>
+                    
+                    <h5>🐛 Correcciones</h5>
+                    <ul>
+                        <li>Corregido error de sesión al registrar vehículos</li>
+                        <li>Mejorado rendimiento de búsquedas</li>
+                        <li>Optimización de consultas a base de datos</li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Versión 0.9.0 (Beta) -->
+            <div class="version-item">
+                <div class="version-header">
+                    <div>
+                        <h4>Versión 0.9.0 (Beta)</h4>
+                        <p>15 de Marzo, 2026</p>
+                    </div>
+                </div>
+                <div class="version-content">
+                    <h5>✨ Nuevas Funcionalidades</h5>
+                    <ul>
+                        <li>Sistema base de órdenes de servicio</li>
+                        <li>Catálogo de servicios</li>
+                        <li>Inventario básico</li>
+                        <li>Login y roles de usuario</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Información del Sistema -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <div class="dot"></div>
+                <span>Información del Sistema</span>
+            </div>
+        </div>
+        
+        <div style="padding: 2rem;">
+            <div class="info-grid">
+                <div class="info-item">
+                    <i class="fas fa-code"></i>
+                    <div>
+                        <strong>Framework</strong>
+                        <p>Spring Boot 3.4.0</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <i class="fas fa-coffee"></i>
+                    <div>
+                        <strong>Java</strong>
+                        <p>JDK 23</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <i class="fas fa-database"></i>
+                    <div>
+                        <strong>Base de Datos</strong>
+                        <p>PostgreSQL</p>
+                    </div>
+                </div>
+
+                <div class="info-item">
+                    <i class="fas fa-server"></i>
+                    <div>
+                        <strong>Servidor</strong>
+                        <p>Tomcat Embebido</p>
+                    </div>
+                </div>
+            </div>
+
+            <div style="margin-top: 2rem; padding-top: 2rem; border-top: 1px solid #e5e7eb;">
+                <p style="margin: 0; color: #6b7280; font-size: 0.875rem;">
+                    <strong>Desarrollado por:</strong> MULTISERVICIOS LUBRICENTRO CAR DETAILING GADIEL E.I.R.L.
+                </p>
+                <p style="margin: 0.5rem 0 0; color: #6b7280; font-size: 0.875rem;">
+                    <strong>RUC:</strong> 20615184421
+                </p>
+            </div>
+        </div>
+    </div>
+
+</div>
+
+<style>
+.version-item {
+    border-left: 3px solid #e5e7eb;
+    padding-left: 1.5rem;
+    margin-bottom: 2rem;
+    position: relative;
+}
+
+.version-item:before {
+    content: '';
+    position: absolute;
+    left: -7px;
+    top: 0;
+    width: 11px;
+    height: 11px;
+    border-radius: 50%;
+    background: #dc2626;
+    border: 2px solid white;
+    box-shadow: 0 0 0 2px #dc2626;
+}
+
+.version-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 1rem;
+}
+
+.version-header h4 {
+    margin: 0;
+    font-size: 1.125rem;
+}
+
+.version-header p {
+    margin: 0.25rem 0 0;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+
+.version-content {
+    color: #6b7280;
+}
+
+.version-content h5 {
+    margin: 1rem 0 0.5rem;
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #111;
+}
+
+.version-content ul {
+    margin: 0;
+    padding-left: 1.5rem;
+}
+
+.version-content li {
+    margin-bottom: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1.5rem;
+}
+
+.info-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 8px;
+}
+
+.info-item i {
+    font-size: 2rem;
+    color: #dc2626;
+}
+
+.info-item strong {
+    display: block;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.info-item p {
+    margin: 0.25rem 0 0;
+    font-size: 1rem;
+    font-weight: 600;
+}
+</style>
+
+<script>
+function buscarActualizaciones() {
+    const btn = event.target;
+    const originalText = btn.innerHTML;
+    
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando...';
+    
+    // Simular búsqueda
+    setTimeout(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+        alert('✅ Tu sistema está actualizado\n\nVersión actual: 1.0.0\nNo hay actualizaciones disponibles.');
+    }, 2000);
+}
+</script>
+
+</th:block>
+</body>
+</html>

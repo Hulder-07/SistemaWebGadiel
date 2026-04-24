@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Personalización - Configuración</title>
+</head>
+<body>
+<th:block layout:fragment="page-title">Personalización</th:block>
+<th:block layout:fragment="content">
+
+<div style="max-width: 900px; margin: 0 auto;">
+    
+    <!-- Breadcrumb -->
+    <nav style="margin-bottom: 2rem;">
+        <a th:href="@{/configuracion}" style="color: #6b7280; text-decoration: none;">
+            <i class="fas fa-arrow-left"></i> Configuración
+        </a>
+        <span style="color: #6b7280; margin: 0 0.5rem;">/</span>
+        <span>Personalización</span>
+    </nav>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <div class="dot"></div>
+                <span>Apariencia del Sistema</span>
+            </div>
+        </div>
+        
+        <div style="padding: 2rem;">
+            
+            <!-- Mensajes -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <form method="post" th:action="@{/configuracion/personalizacion/guardar}" th:object="${config}">
+                
+                <!-- Tema -->
+                <div class="form-group">
+                    <label class="form-label">🌓 Tema</label>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                        
+                        <label class="theme-option" for="tema-claro">
+                            <input type="radio" 
+                                   id="tema-claro" 
+                                   name="tema" 
+                                   value="claro"
+                                   th:checked="${config.tema == 'claro'}">
+                            <div class="theme-preview" style="background: white; color: #111;">
+                                <i class="fas fa-sun"></i>
+                                <span>Claro</span>
+                            </div>
+                        </label>
+
+                        <label class="theme-option" for="tema-oscuro">
+                            <input type="radio" 
+                                   id="tema-oscuro" 
+                                   name="tema" 
+                                   value="oscuro"
+                                   th:checked="${config.tema == 'oscuro'}">
+                            <div class="theme-preview" style="background: #1f2937; color: white;">
+                                <i class="fas fa-moon"></i>
+                                <span>Oscuro</span>
+                            </div>
+                        </label>
+
+                        <label class="theme-option" for="tema-auto">
+                            <input type="radio" 
+                                   id="tema-auto" 
+                                   name="tema" 
+                                   value="auto"
+                                   th:checked="${config.tema == 'auto'}">
+                            <div class="theme-preview" style="background: linear-gradient(to right, white 50%, #1f2937 50%); color: #111;">
+                                <i class="fas fa-adjust"></i>
+                                <span>Automático</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Colores -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    
+                    <!-- Color Primario -->
+                    <div class="form-group">
+                        <label class="form-label">🎨 Color Primario</label>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <input type="color" 
+                                   name="colorPrimario"
+                                   th:value="${config.colorPrimario}"
+                                   style="width: 60px; height: 40px; border: 1px solid #e5e7eb; border-radius: 6px; cursor: pointer;">
+                            <input type="text" 
+                                   class="form-control" 
+                                   th:value="${config.colorPrimario}"
+                                   readonly
+                                   style="flex: 1;">
+                        </div>
+                        <small style="color: #6b7280;">Color principal de la interfaz</small>
+                    </div>
+
+                    <!-- Color Secundario -->
+                    <div class="form-group">
+                        <label class="form-label">🎨 Color Secundario</label>
+                        <div style="display: flex; gap: 0.5rem; align-items: center;">
+                            <input type="color" 
+                                   name="colorSecundario"
+                                   th:value="${config.colorSecundario}"
+                                   style="width: 60px; height: 40px; border: 1px solid #e5e7eb; border-radius: 6px; cursor: pointer;">
+                            <input type="text" 
+                                   class="form-control" 
+                                   th:value="${config.colorSecundario}"
+                                   readonly
+                                   style="flex: 1;">
+                        </div>
+                        <small style="color: #6b7280;">Color para sidebar y elementos secundarios</small>
+                    </div>
+                </div>
+
+                <!-- Tamaño de Texto -->
+                <div class="form-group">
+                    <label class="form-label">📏 Tamaño de Texto</label>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                        
+                        <label class="size-option" for="size-pequeño">
+                            <input type="radio" 
+                                   id="size-pequeño" 
+                                   name="tamanioTexto" 
+                                   value="pequeño"
+                                   th:checked="${config.tamanioTexto == 'pequeño'}">
+                            <div class="size-preview">
+                                <span style="font-size: 0.875rem;">Pequeño</span>
+                            </div>
+                        </label>
+
+                        <label class="size-option" for="size-mediano">
+                            <input type="radio" 
+                                   id="size-mediano" 
+                                   name="tamanioTexto" 
+                                   value="mediano"
+                                   th:checked="${config.tamanioTexto == 'mediano'}">
+                            <div class="size-preview">
+                                <span style="font-size: 1rem;">Mediano</span>
+                            </div>
+                        </label>
+
+                        <label class="size-option" for="size-grande">
+                            <input type="radio" 
+                                   id="size-grande" 
+                                   name="tamanioTexto" 
+                                   value="grande"
+                                   th:checked="${config.tamanioTexto == 'grande'}">
+                            <div class="size-preview">
+                                <span style="font-size: 1.125rem;">Grande</span>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Vista Previa -->
+                <div style="background: #f9fafb; padding: 1.5rem; border-radius: 12px; margin-top: 2rem;">
+                    <h4 style="margin: 0 0 1rem;">Vista Previa</h4>
+                    <div style="background: white; padding: 1.5rem; border-radius: 8px; border: 2px solid #e5e7eb;">
+                        <button type="button" 
+                                id="previewBtn"
+                                style="background: var(--color-primary, #dc2626); color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 6px; font-size: 1rem; cursor: pointer;">
+                            Botón de Ejemplo
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                    <a th:href="@{/configuracion}" class="btn btn-outline">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.theme-option, .size-option {
+    cursor: pointer;
+}
+
+.theme-option input, .size-option input {
+    display: none;
+}
+
+.theme-preview, .size-preview {
+    padding: 1.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.theme-option input:checked + .theme-preview,
+.size-option input:checked + .size-preview {
+    border-color: #dc2626;
+    background-color: #fef2f2;
+}
+
+.theme-preview i {
+    font-size: 2rem;
+    display: block;
+    margin-bottom: 0.5rem;
+}
+
+.size-preview {
+    padding: 1rem;
+}
+</style>
+
+<script>
+// Actualizar vista previa de colores
+document.querySelectorAll('input[type="color"]').forEach(input => {
+    input.addEventListener('input', function() {
+        this.nextElementSibling.value = this.value;
+        actualizarPreview();
+    });
+});
+
+// Actualizar preview al cambiar tema o tamaño
+document.querySelectorAll('input[name="tema"], input[name="tamanioTexto"]').forEach(input => {
+    input.addEventListener('change', actualizarPreview);
+});
+
+function actualizarPreview() {
+    const colorPrimario = document.querySelector('input[name="colorPrimario"]').value;
+    const colorSecundario = document.querySelector('input[name="colorSecundario"]').value;
+    const tema = document.querySelector('input[name="tema"]:checked')?.value;
+    const tamanio = document.querySelector('input[name="tamanioTexto"]:checked')?.value;
+    
+    const previewBtn = document.getElementById('previewBtn');
+    
+    // Aplicar color primario al botón
+    previewBtn.style.background = colorPrimario;
+    
+    // Aplicar tamaño de texto
+    const tamanios = {
+        'pequeño': '0.875rem',
+        'mediano': '1rem',
+        'grande': '1.125rem'
+    };
+    previewBtn.style.fontSize = tamanios[tamanio] || '1rem';
+    
+    // Aplicar tema
+    const preview = previewBtn.parentElement;
+    if (tema === 'oscuro') {
+        preview.style.background = '#1f2937';
+        preview.style.color = '#f3f4f6';
+    } else {
+        preview.style.background = 'white';
+        preview.style.color = '#111';
+    }
+}
+
+// Inicializar preview al cargar
+document.addEventListener('DOMContentLoaded', actualizarPreview);
+</script>
+
+</th:block>
+</body>
+</html>

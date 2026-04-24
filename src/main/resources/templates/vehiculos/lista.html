@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Vehículos</title></head>
+<body>
+<div layout:fragment="page-title">Vehículos</div>
+<div layout:fragment="content">
+<div th:if="${msg}" class="alert-box success" th:text="${msg}"></div>
+<div style="display:flex;justify-content:flex-end;margin-bottom:20px;">
+  <a th:href="@{/vehiculos/nuevo}" class="btn btn-primary"><i class="fa-solid fa-plus"></i> Nuevo Vehículo</a>
+</div>
+<div class="card">
+  <div class="card-header"><div class="card-title"><div class="dot"></div>Listado de Vehículos</div></div>
+  <table>
+    <thead><tr><th>Placa</th><th>Marca / Modelo</th><th>Color</th><th>Tipo</th><th>Cliente</th><th>Acciones</th></tr></thead>
+    <tbody>
+      <tr th:each="v : ${vehiculos}">
+        <td><strong class="mono" th:text="${v.placa}"></strong></td>
+        <td th:text="${v.marca+' '+v.modelo}"></td>
+        <td th:text="${v.color}"></td>
+        <td><span class="pill pill-active" th:text="${v.tipo}"></span></td>
+        <td th:text="${v.cliente!=null?v.cliente.nombre:'—'}"></td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <a th:href="@{/ordenes/nueva}" class="btn btn-sm btn-primary" title="Nueva orden de lavado">
+              <i class="fa-solid fa-soap"></i>
+            </a>
+            <a th:href="@{/vehiculos/editar/{id}(id=${v.id})}" class="btn btn-sm btn-outline"><i class="fa-solid fa-pen"></i></a>
+            <a th:href="@{/vehiculos/eliminar/{id}(id=${v.id})}" class="btn btn-sm btn-outline"
+               onclick="return confirm('¿Eliminar vehículo?')"><i class="fa-solid fa-trash" style="color:#e74c3c;"></i></a>
+          </div>
+        </td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(vehiculos)}">
+        <td colspan="6" style="text-align:center;padding:32px;color:var(--text-muted);">No hay vehículos registrados</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</th:block>
+</body>
+</html>

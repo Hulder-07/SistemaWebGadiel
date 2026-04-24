@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Editar Vehículo</title>
+    <style>
+        .form-container {
+            max-width: 900px;
+            margin: 2rem auto;
+            background: white;
+            border-radius: 12px;
+            padding: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+
+        .form-header {
+            text-align: center;
+            margin-bottom: 2rem;
+        }
+
+        .form-header i {
+            font-size: 3rem;
+            color: #007bff;
+            margin-bottom: 0.5rem;
+        }
+
+        .tipo-vehiculo-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .tipo-btn {
+            padding: 1.5rem 1rem;
+            border: 2px solid #dee2e6;
+            border-radius: 12px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .tipo-btn:hover {
+            border-color: #007bff;
+            background: #f8f9fa;
+        }
+
+        .tipo-btn.selected {
+            border-color: #007bff;
+            background: #cfe2ff;
+        }
+
+        .tipo-btn .icon {
+            font-size: 2.5rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .tipo-btn .label {
+            font-weight: 600;
+            font-size: 0.875rem;
+        }
+
+        .metodo-pago-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .pago-btn {
+            padding: 1rem;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            background: white;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+        }
+
+        .pago-btn:hover {
+            border-color: #007bff;
+        }
+
+        .pago-btn.selected {
+            border-color: #007bff;
+            background: #e7f3ff;
+        }
+
+        .pago-btn .icon {
+            font-size: 2rem;
+            display: block;
+            margin-bottom: 0.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 1rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+        }
+
+        input[type="radio"] {
+            display: none;
+        }
+
+        .info-box {
+            background: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 1rem;
+            margin-bottom: 1.5rem;
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container">
+        <div class="form-container">
+            <div class="form-header">
+                <i class="fas fa-edit"></i>
+                <h2>Editar Vehículo</h2>
+                <p class="text-muted">
+                    Registro N° <strong th:text="${registro.numeroOrden}">1</strong>
+                </p>
+            </div>
+
+            <div class="info-box">
+                <i class="fas fa-info-circle"></i>
+                <strong>Nota:</strong> Los cambios se reflejarán inmediatamente en los totales de la caja.
+            </div>
+
+            <!-- Mensaje de error -->
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <i class="fas fa-exclamation-circle"></i> <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Formulario de edición -->
+            <form th:action="@{/caja-lavadero/editar}" method="post">
+                <input type="hidden" name="id" th:value="${registro.id}">
+
+                <!-- Tipo de Vehículo -->
+                <div class="form-group">
+                    <label class="form-label">🚗 Tipo de Vehículo *</label>
+                    <div class="tipo-vehiculo-grid">
+                        <label class="tipo-btn" th:classappend="${registro.tipoVehiculo == 'MOTO' ? 'selected' : ''}" for="tipo-moto">
+                            <input type="radio" id="tipo-moto" name="tipoVehiculo" value="MOTO" 
+                                   th:checked="${registro.tipoVehiculo == 'MOTO'}" required>
+                            <span class="icon">🏍️</span>
+                            <span class="label">Moto</span>
+                        </label>
+
+                        <label class="tipo-btn" th:classappend="${registro.tipoVehiculo == 'AUTO' ? 'selected' : ''}" for="tipo-auto">
+                            <input type="radio" id="tipo-auto" name="tipoVehiculo" value="AUTO" 
+                                   th:checked="${registro.tipoVehiculo == 'AUTO'}" required>
+                            <span class="icon">🚗</span>
+                            <span class="label">Auto</span>
+                        </label>
+
+                        <label class="tipo-btn" th:classappend="${registro.tipoVehiculo == 'CAMIONETA' ? 'selected' : ''}" for="tipo-camioneta">
+                            <input type="radio" id="tipo-camioneta" name="tipoVehiculo" value="CAMIONETA" 
+                                   th:checked="${registro.tipoVehiculo == 'CAMIONETA'}" required>
+                            <span class="icon">🚙</span>
+                            <span class="label">Camioneta</span>
+                        </label>
+
+                        <label class="tipo-btn" th:classappend="${registro.tipoVehiculo == 'SUV' ? 'selected' : ''}" for="tipo-suv">
+                            <input type="radio" id="tipo-suv" name="tipoVehiculo" value="SUV" 
+                                   th:checked="${registro.tipoVehiculo == 'SUV'}" required>
+                            <span class="icon">🚘</span>
+                            <span class="label">SUV</span>
+                        </label>
+
+                        <label class="tipo-btn" th:classappend="${registro.tipoVehiculo == 'CAMION' ? 'selected' : ''}" for="tipo-camion">
+                            <input type="radio" id="tipo-camion" name="tipoVehiculo" value="CAMION" 
+                                   th:checked="${registro.tipoVehiculo == 'CAMION'}" required>
+                            <span class="icon">🚛</span>
+                            <span class="label">Camión</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Placa -->
+                <div class="form-group">
+                    <label class="form-label" for="placa">🔖 Placa</label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="placa" 
+                           name="placa"
+                           th:value="${registro.placa}"
+                           placeholder="ABC-123"
+                           maxlength="10"
+                           style="text-transform: uppercase;">
+                </div>
+
+                <!-- Servicio -->
+                <div class="form-group">
+                    <label class="form-label" for="servicioDescripcion">🧼 Servicio</label>
+                    <input type="text" 
+                           class="form-control" 
+                           id="servicioDescripcion" 
+                           name="servicioDescripcion"
+                           th:value="${registro.servicioDescripcion != null ? registro.servicioDescripcion : (registro.servicio != null ? registro.servicio.nombre : '')}"
+                           placeholder="Descripción del servicio">
+                </div>
+
+                <!-- Monto -->
+                <div class="form-group">
+                    <label class="form-label" for="monto">💰 Monto *</label>
+                    <div class="input-group">
+                        <span class="input-group-text">S/</span>
+                        <input type="number" 
+                               class="form-control" 
+                               id="monto" 
+                               name="monto" 
+                               step="0.01" 
+                               min="0.01"
+                               th:value="${registro.monto}"
+                               required>
+                    </div>
+                </div>
+
+                <!-- Método de Pago -->
+                <div class="form-group">
+                    <label class="form-label">💳 Método de Pago *</label>
+                    <div class="metodo-pago-grid">
+                        <label class="pago-btn" th:classappend="${registro.metodoPago == 'EFECTIVO' ? 'selected' : ''}" for="pago-efectivo">
+                            <input type="radio" id="pago-efectivo" name="metodoPago" value="EFECTIVO" 
+                                   th:checked="${registro.metodoPago == 'EFECTIVO'}" required>
+                            <span class="icon">💵</span>
+                            <span class="label">Efectivo</span>
+                        </label>
+
+                        <label class="pago-btn" th:classappend="${registro.metodoPago == 'YAPE' ? 'selected' : ''}" for="pago-yape">
+                            <input type="radio" id="pago-yape" name="metodoPago" value="YAPE" 
+                                   th:checked="${registro.metodoPago == 'YAPE'}" required>
+                            <span class="icon">📱</span>
+                            <span class="label">Yape</span>
+                        </label>
+
+                        <label class="pago-btn" th:classappend="${registro.metodoPago == 'TARJETA' ? 'selected' : ''}" for="pago-tarjeta">
+                            <input type="radio" id="pago-tarjeta" name="metodoPago" value="TARJETA" 
+                                   th:checked="${registro.metodoPago == 'TARJETA'}" required>
+                            <span class="icon">💳</span>
+                            <span class="label">Tarjeta</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Observaciones -->
+                <div class="form-group">
+                    <label class="form-label" for="observaciones">📝 Observaciones</label>
+                    <textarea class="form-control" 
+                              id="observaciones" 
+                              name="observaciones" 
+                              rows="3"
+                              th:text="${registro.observaciones}"
+                              placeholder="Notas adicionales..."></textarea>
+                </div>
+
+                <!-- Botones -->
+                <div class="d-grid gap-2">
+                    <button type="submit" class="btn btn-primary btn-submit">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                    <a th:href="@{/caja-lavadero}" class="btn btn-secondary">
+                        <i class="fas fa-arrow-left"></i> Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        // Selección visual de tipo de vehículo
+        document.querySelectorAll('.tipo-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.tipo-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // Selección visual de método de pago
+        document.querySelectorAll('.pago-btn').forEach(btn => {
+            btn.addEventListener('click', function() {
+                document.querySelectorAll('.pago-btn').forEach(b => b.classList.remove('selected'));
+                this.classList.add('selected');
+            });
+        });
+
+        // Formato de placa en mayúsculas
+        document.getElementById('placa').addEventListener('input', function() {
+            this.value = this.value.toUpperCase();
+        });
+    </script>
+</div>
+</body>
+</html>

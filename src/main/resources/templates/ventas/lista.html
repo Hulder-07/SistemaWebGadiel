@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Ventas Tienda</title></head>
+<body>
+<div layout:fragment="page-title">Venta - Tienda</div>
+<div layout:fragment="content">
+
+<div th:if="${msg}" class="alert-box success" th:text="${msg}"></div>
+
+<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+  <div></div>
+  <a th:href="@{/ventas/nueva}" class="btn btn-primary">
+    <i class="fa-solid fa-cart-plus"></i> Nueva Venta
+  </a>
+</div>
+
+<div class="card">
+  <div class="card-header">
+    <div class="card-title"><div class="dot"></div>Últimas Ventas de Productos</div>
+  </div>
+  <table>
+    <thead>
+      <tr><th>Boleta</th><th>Producto</th><th>Cliente</th><th>Cantidad</th><th>Total</th><th>Fecha</th><th>Acciones</th></tr>
+    </thead>
+    <tbody>
+      <tr th:each="v : ${ventas}">
+        <td><span class="mono" th:text="${v.numeroBoleta}"></span></td>
+        <td th:text="${v.producto.nombre}"></td>
+        <td th:text="${v.cliente}"></td>
+        <td th:text="${v.cantidad}"></td>
+        <td th:text="'S/ '+${#numbers.formatDecimal(v.total,1,'COMMA',2,'POINT')}"></td>
+        <td th:text="${#temporals.format(v.fecha,'dd/MM/yyyy HH:mm')}"></td>
+        <td>
+          <div style="display:flex;gap:6px;">
+            <a th:href="@{/ventas/boleta/{b}(b=${v.numeroBoleta})}" class="btn btn-sm btn-outline" title="Ver detalle">
+              <i class="fa-solid fa-eye"></i>
+            </a>
+            <a th:href="@{/ventas/boleta/{b}/pdf(b=${v.numeroBoleta})}" class="btn btn-sm btn-outline" title="Descargar PDF">
+              <i class="fa-solid fa-file-pdf" style="color:#e74c3c;"></i>
+            </a>
+            <a th:href="@{/sunat/emitir/venta/{b}(b=${v.numeroBoleta})}" class="btn btn-sm btn-outline" title="Emitir Factura/Boleta">
+              <i class="fa-solid fa-file-invoice-dollar" style="color:var(--green);"></i>
+            </a>
+            <a th:href="@{/ventas/eliminar/{id}(id=${v.id})}" class="btn btn-sm btn-outline"
+               onclick="return confirm('¿Eliminar esta venta?')" title="Eliminar">
+              <i class="fa-solid fa-trash" style="color:#e74c3c;"></i>
+            </a>
+          </div>
+        </td>
+      </tr>
+      <tr th:if="${#lists.isEmpty(ventas)}">
+        <td colspan="7" style="text-align:center;padding:32px;color:var(--text-muted);">No hay ventas registradas</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+</th:block>
+</body>
+</html>

@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Usuarios</title></head>
+<body>
+<div layout:fragment="page-title">Géstion de Usuarios</div>
+<div layout:fragment="content">
+<div th:if="${msg}"   class="alert-box success" th:text="${msg}"></div>
+<div th:if="${error}" class="alert-box danger"  th:text="${error}"></div>
+
+<div style="display:flex;justify-content:flex-end;margin-bottom:20px;">
+  <a th:href="@{/usuarios/nuevo}" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Nuevo Usuario</a>
+</div>
+
+<div class="card">
+  <div class="card-header"><div class="card-title"><div class="dot"></div>Usuarios del Sistema</div></div>
+  <table>
+    <thead><tr><th>Usuario</th><th>Nombre</th><th>Roles</th><th>Estado</th><th>Acciones</th></tr></thead>
+    <tbody>
+      <tr th:each="u : ${usuarios}">
+        <td>
+          <div style="display:flex;align-items:center;gap:10px;">
+            <div style="width:32px;height:32px;border-radius:50%;background:var(--accent-glow);border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;color:var(--accent);"
+                 th:text="${#strings.substring(u.username,0,1).toUpperCase()}">U</div>
+            <strong th:text="${u.username}"></strong>
+          </div>
+        </td>
+        <td th:text="${u.nombre?:'-'}"></td>
+        <td>
+          <div style="display:flex;gap:4px;flex-wrap:wrap;">
+            <span th:each="r : ${u.roles}" class="pill"
+                  th:classappend="${r.nombre=='ADMIN'}?'pill-critical':(${r.nombre=='CAJERO'}?'pill-info':'pill-active')"
+                  th:text="${r.nombre}"></span>
+          </div>
+        </td>
+        <td>
+          <span class="pill pill-active">Activo</span>
+        </td>
+        <td>
+          <a th:href="@{/usuarios/eliminar/{id}(id=${u.id})}" class="btn btn-sm btn-outline"
+             th:if="${u.username!='admin'}"
+             onclick="return confirm('¿Eliminar usuario?')">
+            <i class="fa-solid fa-trash" style="color:#e74c3c;"></i>
+          </a>
+          <span th:if="${u.username=='admin'}" style="font-size:12px;color:var(--text-muted);">
+            <i class="fa-solid fa-shield-check" style="color:var(--success);"></i> Protegido
+          </span>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Guía de roles -->
+<div class="card" style="padding:20px 24px;">
+  <div class="card-title" style="margin-bottom:12px;"><div class="dot"></div>Descripción de Roles</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+    <div style="padding:14px;background:var(--bg-main);border-radius:var(--radius-sm);border-left:3px solid var(--danger);">
+      <div style="font-weight:700;margin-bottom:4px;"><i class="fa-solid fa-crown" style="color:var(--danger);margin-right:6px;"></i>ADMIN</div>
+      <div style="font-size:12.5px;color:var(--text-muted);">Acceso total al sistema. Puede ver reportes, gestionar usuarios y configuración.</div>
+    </div>
+    <div style="padding:14px;background:var(--bg-main);border-radius:var(--radius-sm);border-left:3px solid var(--info);">
+      <div style="font-weight:700;margin-bottom:4px;"><i class="fa-solid fa-cash-register" style="color:var(--info);margin-right:6px;"></i>CAJERO</div>
+      <div style="font-size:12.5px;color:var(--text-muted);">Puede registrar ventas de productos, gestionar clientes y ver inventario.</div>
+    </div>
+    <div style="padding:14px;background:var(--bg-main);border-radius:var(--radius-sm);border-left:3px solid var(--success);">
+      <div style="font-weight:700;margin-bottom:4px;"><i class="fa-solid fa-soap" style="color:var(--success);margin-right:6px;"></i>LAVADOR</div>
+      <div style="font-size:12.5px;color:var(--text-muted);">Puede ver y actualizar el estado de las órdenes de servicio asignadas.</div>
+    </div>
+  </div>
+</div>
+</th:block>
+</body>
+</html>

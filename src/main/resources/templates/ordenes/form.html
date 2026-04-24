@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Nueva Orden</title></head>
+<body>
+<th:block layout:fragment="page-title">Nueva Orden de Lavado</th:block>
+<th:block layout:fragment="content">
+
+<div th:if="${error}" class="alert-box danger" th:text="${error}"></div>
+
+<div style="max-width:700px;">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><div class="dot"></div>Registrar Orden de Servicio</div>
+    </div>
+    <div style="padding:24px;">
+      <form method="post" th:action="@{/ordenes/guardar}">
+
+        <!-- Vehículo -->
+        <span class="form-section-label" style="padding-top:0;border-top:none;"><i class="fa-solid fa-car" style="color:var(--accent);margin-right:6px;"></i>Datos del Vehículo</span>
+        <div class="form-group">
+          <label class="form-label">Vehículo (Placa)</label>
+          <input type="text" name="placaInput" list="vehiculosList" class="form-control" required style="text-transform:uppercase;"
+                 id="selVehiculo" oninput="actualizarCliente()" placeholder="Escribe o selecciona la placa" autocomplete="off"/>
+          <datalist id="vehiculosList">
+            <option th:each="v : ${vehiculos}" th:value="${v.placa}"
+                    th:attr="data-cliente=${v.cliente!=null?v.cliente.nombre:''}"></option>
+          </datalist>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cliente asociado</label>
+          <input type="text" id="clienteDisplay" name="clienteManual" class="form-control"
+                 placeholder="Cliente automático o escribe uno nuevo" autocomplete="off"/>
+        </div>
+
+        <!-- Servicio -->
+        <span class="form-section-label"><i class="fa-solid fa-soap" style="color:var(--accent);margin-right:6px;"></i>Tipo de Servicio</span>
+
+        <!-- Filtro de categoría de servicios -->
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px;">
+          <button type="button" onclick="filtrarServOrden('todos')" class="pcat-btn active" data-pcat="todos">
+            <i class="fa-solid fa-border-all"></i> Todos
+          </button>
+          <button type="button" onclick="filtrarServOrden('basico')" class="pcat-btn" data-pcat="basico">
+            <i class="fa-solid fa-droplet"></i> Básico
+          </button>
+          <button type="button" onclick="filtrarServOrden('completo')" class="pcat-btn" data-pcat="completo">
+            <i class="fa-solid fa-car-wash"></i> Completo
+          </button>
+          <button type="button" onclick="filtrarServOrden('premium')" class="pcat-btn" data-pcat="premium">
+            <i class="fa-solid fa-crown"></i> Premium
+          </button>
+          <button type="button" onclick="filtrarServOrden('detailing')" class="pcat-btn" data-pcat="detailing">
+            <i class="fa-solid fa-gem"></i> Detailing
+          </button>
+          <button type="button" onclick="filtrarServOrden('especial')" class="pcat-btn" data-pcat="especial">
+            <i class="fa-solid fa-bolt"></i> Especial
+          </button>
+          <button type="button" onclick="filtrarServOrden('moto')" class="pcat-btn" data-pcat="moto">
+            <i class="fa-solid fa-motorcycle"></i> Moto
+          </button>
+        </div>
+
+        <div class="form-group">
+          <select name="servicioId" id="selServicio" class="form-control" required onchange="actualizarServInfo(this)">
+            <option value="">— Selecciona un servicio —</option>
+            <option th:each="s : ${servicios}" th:value="${s.id}"
+                    th:text="${s.nombre+' — S/ '+s.precio+' ('+s.duracionMinutos+' min)'}"
+                    th:attr="data-precio=${s.precio},data-dur=${s.duracionMinutos},data-cat=${s.categoria}"
+                    th:disabled="${!s.activo}">
+            </option>
+          </select>
+        </div>
+
+        <!-- Info servicio seleccionado -->
+        <div id="servInfo" style="display:none;background:var(--accent-glow);border:1px solid var(--accent);border-radius:var(--radius-sm);padding:14px 16px;margin-top:-8px;margin-bottom:16px;">
+          <div style="display:flex;gap:24px;">
+            <div>
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px;">Precio del servicio</div>
+              <div id="servPrecioDisplay" style="font-size:20px;font-weight:800;color:var(--accent);">S/ 0.00</div>
+            </div>
+            <div>
+              <div style="font-size:11px;color:var(--text-muted);margin-bottom:2px;">Duración estimada</div>
+              <div id="servDurDisplay" style="font-size:15px;font-weight:700;"><i class="fa-regular fa-clock" style="margin-right:4px;"></i>—</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Observaciones -->
+        <span class="form-section-label"><i class="fa-solid fa-note-sticky" style="color:var(--accent);margin-right:6px;"></i>Observaciones</span>
+        <div class="form-group">
+          <textarea name="observaciones" class="form-control" rows="3"
+                    placeholder="Ej: Rayón en puerta derecha, cliente solicitó cera extra..."></textarea>
+        </div>
+
+        <div style="display:flex;gap:12px;margin-top:8px;">
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-soap"></i> Crear Orden
+          </button>
+          <a th:href="@{/ordenes}" class="btn btn-outline">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div class="card" style="padding:14px 24px;">
+    <div style="font-size:13px;color:var(--text-muted);">
+      <i class="fa-solid fa-circle-info" style="color:var(--accent);"></i>
+      ¿Vehículo no está en la lista?
+      <a th:href="@{/vehiculos/nuevo}" style="color:var(--accent);font-weight:600;"> Registrar vehículo nuevo →</a>
+    </div>
+  </div>
+</div>
+
+</th:block>
+<th:block layout:fragment="scripts">
+<script>
+function actualizarCliente(){
+  const input = document.getElementById('selVehiculo');
+  const val = input.value.toUpperCase();
+  const list = document.getElementById('vehiculosList');
+  const opts = list.options;
+  let clientName = '';
+  
+  for(let i=0; i<opts.length; i++) {
+    if(opts[i].value.toUpperCase() === val) {
+      clientName = opts[i].getAttribute('data-cliente');
+      break;
+    }
+  }
+  
+  const clienteInput = document.getElementById('clienteDisplay');
+  if (clientName) {
+      clienteInput.value = clientName;
+      clienteInput.setAttribute('readonly', 'true');
+      clienteInput.style.background = 'var(--bg-main)';
+  } else {
+      clienteInput.removeAttribute('readonly');
+      clienteInput.style.background = '';
+      if(!val) clienteInput.value = '';
+  }
+}
+function filtrarServOrden(cat){
+  document.querySelectorAll('.pcat-btn').forEach(b=>b.classList.toggle('active',b.dataset.pcat===cat));
+  const sel=document.getElementById('selServicio');
+  Array.from(sel.options).forEach(opt=>{
+    if(!opt.value){opt.style.display='';return;}
+    opt.style.display=(cat==='todos'||opt.dataset.cat===cat)?'':'none';
+  });
+  const selOpt=sel.options[sel.selectedIndex];
+  if(selOpt&&selOpt.style.display==='none'){sel.value='';document.getElementById('servInfo').style.display='none';}
+}
+function actualizarServInfo(sel){
+  const opt=sel.options[sel.selectedIndex];
+  const precio=parseFloat(opt.getAttribute('data-precio')||0);
+  const dur=opt.getAttribute('data-dur')||'—';
+  document.getElementById('servPrecioDisplay').textContent='S/ '+precio.toFixed(2);
+  document.getElementById('servDurDisplay').innerHTML='<i class="fa-regular fa-clock" style="margin-right:4px;"></i>'+dur+' minutos';
+  document.getElementById('servInfo').style.display=precio>0?'':'none';
+}
+</script>
+</th:block>
+</body>
+</html>

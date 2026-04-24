@@ -1,0 +1,921 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+  <title>Car Detailing Gadiel — Acceso</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow+Condensed:wght@300;400;500;600;700;800&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --red:       #e63946;
+      --red-dk:    #c1121f;
+      --red-lt:    rgba(230,57,70,0.12);
+      --red-glow:  rgba(230,57,70,0.4);
+      --red-mid:   rgba(230,57,70,0.25);
+      --black:     #080808;
+      --dark:      #0f0f0f; 
+      --dark2:     #161616;
+      --dark3:     #1e1e1e;
+      --border:    rgba(255,255,255,0.07);
+      --border2:   rgba(255,255,255,0.12);
+      --glass:     rgba(255,255,255,0.03);
+      --text:      #f0f0f0;
+      --muted:     rgba(255,255,255,0.38);
+      --muted2:    rgba(255,255,255,0.6);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+
+    body {
+      font-family: 'Barlow', sans-serif;
+      min-height: 100vh;
+      background: var(--black);
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* ── NOISE TEXTURE OVERLAY ── */
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+      pointer-events: none;
+      z-index: 999;
+      opacity: 0.4;
+    }
+
+    /* ════════════════════════════
+       PANEL IZQUIERDO
+    ════════════════════════════ */
+    .left-panel {
+      width: 58%;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 48px 56px;
+    }
+
+    /* Imagen de fondo */
+    .left-bg {
+      position: absolute;
+      inset: 0;
+      background-image: url('/images/fondo.jpg');
+      background-size: cover;
+      background-position: center 30%;
+      filter: brightness(0.28) saturate(0.6);
+      transition: transform 12s ease;
+      z-index: 0;
+    }
+    .left-panel:hover .left-bg { transform: scale(1.05); }
+
+    /* Gradientes */
+    .left-grad {
+      position: absolute;
+      inset: 0;
+      background:
+        linear-gradient(to right, rgba(8,8,8,0) 0%, rgba(8,8,8,0.15) 100%),
+        linear-gradient(to top, rgba(8,8,8,0.97) 0%, rgba(8,8,8,0.5) 40%, transparent 70%);
+      z-index: 1;
+    }
+
+    /* Acento rojo diagonal */
+    .left-accent {
+      position: absolute;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: linear-gradient(135deg, rgba(230,57,70,0.07) 0%, transparent 50%);
+      z-index: 1;
+    }
+
+    /* Líneas decorativas */
+    .grid-lines {
+      position: absolute;
+      inset: 0;
+      z-index: 1;
+      overflow: hidden;
+      opacity: 0.06;
+    }
+    .grid-lines::before {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background-image:
+        linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px);
+      background-size: 80px 80px;
+    }
+
+    .left-top { position: relative; z-index: 2; }
+    .left-bottom { position: relative; z-index: 2; }
+
+    /* Logo marca */
+    .brand-mark {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+    }
+    .brand-mark .logo-wrap {
+      width: 44px; height: 44px;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1.5px solid rgba(255,255,255,0.15);
+    }
+    .brand-mark .logo-wrap img {
+      width: 100%; height: 100%;
+      object-fit: cover;
+    }
+    .brand-mark .logo-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .brand-mark .logo-text .name {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 14px;
+      font-weight: 700;
+      color: rgba(255,255,255,0.9);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+    .brand-mark .logo-text .sub {
+      font-size: 10px;
+      color: var(--muted);
+      letter-spacing: 1.5px;
+      text-transform: uppercase;
+    }
+
+    /* Título hero */
+    .hero-block { margin-bottom: 36px; }
+
+    .hero-kicker {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 20px;
+    }
+    .hero-kicker .line {
+      width: 32px; height: 2px;
+      background: var(--red);
+    }
+    .hero-kicker span {
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--red);
+    }
+
+    .hero-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: clamp(64px, 7vw, 96px);
+      line-height: 0.88;
+      color: #fff;
+      letter-spacing: 3px;
+      margin-bottom: 22px;
+    }
+    .hero-title .stroke {
+      -webkit-text-stroke: 1.5px rgba(255,255,255,0.35);
+      color: transparent;
+    }
+    .hero-title .filled { color: #fff; }
+    .hero-title .red    { color: var(--red); }
+
+    .hero-desc {
+      font-size: 14.5px;
+      line-height: 1.7;
+      color: var(--muted);
+      max-width: 400px;
+      font-weight: 300;
+    }
+
+    /* Chips de features */
+    .features {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 36px;
+    }
+    .chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 7px 13px;
+      background: rgba(255,255,255,0.05);
+      border: 1px solid rgba(255,255,255,0.09);
+      border-radius: 100px;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.65);
+      letter-spacing: 0.3px;
+      transition: all 0.2s;
+      cursor: default;
+    }
+    .chip:hover {
+      background: var(--red-lt);
+      border-color: rgba(230,57,70,0.3);
+      color: #fff;
+    }
+    .chip i { color: var(--red); font-size: 10px; }
+
+    /* Barra inferior */
+    .bottom-bar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .location {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 11px;
+      color: rgba(255,255,255,0.25);
+      letter-spacing: 1px;
+      text-transform: uppercase;
+    }
+    .location i { color: var(--red); font-size: 9px; }
+
+    .version-tag {
+      font-family: 'Barlow Condensed', sans-serif;
+      font-size: 11px;
+      font-weight: 600;
+      letter-spacing: 2px;
+      color: rgba(255,255,255,0.15);
+      text-transform: uppercase;
+    }
+
+    /* ════════════════════════════
+       DIVISOR VERTICAL
+    ════════════════════════════ */
+    .divider-v {
+      width: 1px;
+      background: linear-gradient(to bottom,
+        transparent 0%,
+        rgba(230,57,70,0.4) 30%,
+        rgba(230,57,70,0.4) 70%,
+        transparent 100%);
+      position: relative;
+      z-index: 10;
+      flex-shrink: 0;
+    }
+    .divider-v::before {
+      content: '';
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 8px;
+      height: 8px;
+      background: var(--red);
+      border-radius: 50%;
+      box-shadow: 0 0 16px var(--red-glow);
+    }
+
+    /* ════════════════════════════
+       PANEL DERECHO
+    ════════════════════════════ */
+    .right-panel {
+      width: 42%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 48px 40px;
+      background: var(--dark);
+      position: relative;
+      overflow: hidden;
+    }
+
+    /* Glow de fondo */
+    .right-glow {
+      position: absolute;
+      width: 600px;
+      height: 600px;
+      background: radial-gradient(circle, rgba(230,57,70,0.06) 0%, transparent 65%);
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      pointer-events: none;
+    }
+
+    /* Círculo decorativo */
+    .deco-circle {
+      position: absolute;
+      width: 320px;
+      height: 320px;
+      border: 1px solid rgba(230,57,70,0.06);
+      border-radius: 50%;
+      bottom: -80px;
+      right: -80px;
+    }
+    .deco-circle-2 {
+      position: absolute;
+      width: 200px;
+      height: 200px;
+      border: 1px solid rgba(255,255,255,0.04);
+      border-radius: 50%;
+      top: -40px;
+      left: -40px;
+    }
+
+    /* LOGIN BOX */
+    .login-box {
+      width: 100%;
+      max-width: 380px;
+      position: relative;
+      z-index: 2;
+    }
+
+    /* Animación entrada */
+    .login-box { animation: enterUp 0.7s cubic-bezier(0.16,1,0.3,1) forwards; }
+    @keyframes enterUp {
+      from { opacity: 0; transform: translateY(28px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Header login */
+    .login-header { margin-bottom: 36px; }
+    .login-eyebrow {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+    }
+    .login-eyebrow .dot {
+      width: 6px; height: 6px;
+      background: var(--red);
+      border-radius: 50%;
+      box-shadow: 0 0 8px var(--red);
+      animation: pulse 2s infinite;
+    }
+    @keyframes pulse {
+      0%,100% { box-shadow: 0 0 8px var(--red); }
+      50%      { box-shadow: 0 0 16px var(--red), 0 0 24px rgba(230,57,70,0.3); }
+    }
+    .login-eyebrow span {
+      font-size: 10.5px;
+      font-weight: 700;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      color: var(--red);
+    }
+
+    .login-title {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 48px;
+      color: #fff;
+      letter-spacing: 3px;
+      line-height: 1;
+      margin-bottom: 6px;
+    }
+    .login-sub {
+      font-size: 13px;
+      color: var(--muted);
+      font-weight: 300;
+    }
+
+    /* Stats */
+    .stats-row {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+      margin-bottom: 32px;
+    }
+    .stat-card {
+      background: var(--dark2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 11px 8px;
+      text-align: center;
+      transition: border-color 0.2s;
+    }
+    .stat-card:hover { border-color: rgba(230,57,70,0.25); }
+    .stat-val {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 20px;
+      color: var(--red);
+      letter-spacing: 1.5px;
+      line-height: 1;
+    }
+    .stat-lbl {
+      font-size: 9.5px;
+      color: rgba(255,255,255,0.25);
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-top: 3px;
+    }
+
+    /* Alertas */
+    .alert {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      padding: 12px 15px;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 500;
+      margin-bottom: 22px;
+      border: 1px solid;
+      animation: fadeSlide 0.3s ease;
+    }
+    @keyframes fadeSlide {
+      from { opacity:0; transform: translateY(-6px); }
+      to   { opacity:1; transform: translateY(0); }
+    }
+    .alert-error {
+      background: rgba(230,57,70,0.08);
+      border-color: rgba(230,57,70,0.25);
+      color: #ff8a8a;
+    }
+    .alert-success {
+      background: rgba(39,174,96,0.08);
+      border-color: rgba(39,174,96,0.25);
+      color: #7be8a0;
+    }
+    .alert i { flex-shrink: 0; }
+
+    /* Campos */
+    .fields { display: flex; flex-direction: column; gap: 16px; margin-bottom: 24px; }
+
+    .field-group { display: flex; flex-direction: column; gap: 7px; }
+
+    .field-lbl {
+      font-size: 10px;
+      font-weight: 700;
+      letter-spacing: 2px;
+      text-transform: uppercase;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .field-wrap {
+      position: relative;
+      display: flex;
+      align-items: center;
+    }
+
+    .field-wrap input {
+      width: 100%;
+      padding: 13px 44px;
+      background: var(--dark2);
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      font-size: 14.5px;
+      font-family: 'Barlow', sans-serif;
+      font-weight: 400;
+      color: var(--text);
+      outline: none;
+      transition: all 0.25s;
+      letter-spacing: 0.3px;
+    }
+    .field-wrap input::placeholder { color: rgba(255,255,255,0.18); }
+    .field-wrap input:focus {
+      border-color: var(--red);
+      background: rgba(230,57,70,0.05);
+      box-shadow: 0 0 0 3px rgba(230,57,70,0.08);
+    }
+
+    /* Icono izquierdo */
+    .fi-left {
+      position: absolute;
+      left: 15px;
+      color: rgba(255,255,255,0.2);
+      font-size: 13px;
+      pointer-events: none;
+      transition: color 0.2s;
+    }
+    .field-wrap:focus-within .fi-left { color: var(--red); }
+
+    /* Botón ojo */
+    .eye-btn {
+      position: absolute;
+      right: 13px;
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: rgba(255,255,255,0.2);
+      font-size: 13px;
+      padding: 4px;
+      transition: color 0.2s;
+    }
+    .eye-btn:hover { color: rgba(255,255,255,0.55); }
+
+    /* Botón submit */
+    .btn-submit {
+      width: 100%;
+      padding: 15px;
+      background: var(--red);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      font-size: 13px;
+      font-weight: 700;
+      font-family: 'Barlow Condensed', sans-serif;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      transition: all 0.22s;
+      position: relative;
+      overflow: hidden;
+    }
+    .btn-submit::before {
+      content: '';
+      position: absolute;
+      top: 0; left: -100%;
+      width: 100%; height: 100%;
+      background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+      transition: left 0.5s;
+    }
+    .btn-submit:hover::before { left: 100%; }
+    .btn-submit:hover {
+      background: var(--red-dk);
+      transform: translateY(-1px);
+      box-shadow: 0 6px 28px rgba(230,57,70,0.45);
+    }
+    .btn-submit:active { transform: translateY(0); box-shadow: none; }
+
+    /* Separador */
+    .sep {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 22px 0 0;
+    }
+    .sep::before, .sep::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: var(--border);
+    }
+    .sep span {
+      font-size: 10px;
+      color: rgba(255,255,255,0.18);
+      letter-spacing: 2px;
+      text-transform: uppercase;
+    }
+
+    /* Footer */
+    .login-footer {
+      margin-top: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+    .copy-txt {
+      font-size: 10.5px;
+      color: rgba(255,255,255,0.18);
+    }
+    .support-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 11.5px;
+      font-weight: 500;
+      color: rgba(255,255,255,0.28);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'Barlow', sans-serif;
+      padding: 0;
+      transition: color 0.2s;
+    }
+    .support-btn:hover { color: var(--red); }
+    .support-btn i { font-size: 12px; }
+
+    /* ── MODAL ── */
+    .modal-overlay {
+      position: fixed; inset: 0;
+      background: rgba(0,0,0,0.8);
+      backdrop-filter: blur(12px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+    }
+    .modal-overlay.open { display: flex; }
+
+    .modal-box {
+      background: var(--dark2);
+      border: 1px solid rgba(255,255,255,0.1);
+      border-radius: 18px;
+      width: 90%;
+      max-width: 380px;
+      overflow: hidden;
+      animation: enterUp 0.3s ease;
+    }
+    .modal-head {
+      padding: 20px 24px;
+      background: linear-gradient(135deg, var(--red-dk), var(--red));
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .modal-head h3 {
+      font-family: 'Bebas Neue', sans-serif;
+      font-size: 22px;
+      color: #fff;
+      letter-spacing: 2px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+    .modal-close {
+      width: 28px; height: 28px;
+      background: rgba(255,255,255,0.15);
+      border: none; cursor: pointer; color: #fff;
+      border-radius: 50%;
+      font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s;
+    }
+    .modal-close:hover { background: rgba(255,255,255,0.28); }
+
+    .modal-body { padding: 20px 24px; }
+    .contact-item {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      padding: 11px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.05);
+    }
+    .contact-item:last-child { border-bottom: none; }
+    .contact-ico {
+      width: 38px; height: 38px;
+      border-radius: 10px;
+      background: var(--red-lt);
+      border: 1px solid rgba(230,57,70,0.2);
+      display: flex; align-items: center; justify-content: center;
+      color: var(--red); font-size: 14px;
+      flex-shrink: 0;
+    }
+    .contact-data strong {
+      display: block;
+      font-size: 12.5px;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 2px;
+    }
+    .contact-data span { font-size: 12px; color: var(--muted); }
+
+    .modal-foot {
+      padding: 14px 24px;
+      border-top: 1px solid rgba(255,255,255,0.06);
+      text-align: right;
+    }
+    .btn-ok {
+      background: var(--red);
+      color: #fff;
+      border: none;
+      padding: 9px 22px;
+      border-radius: 8px;
+      font-size: 12.5px;
+      font-weight: 600;
+      font-family: 'Barlow', sans-serif;
+      cursor: pointer;
+      transition: background 0.2s;
+    }
+    .btn-ok:hover { background: var(--red-dk); }
+
+    /* ── Responsive ── */
+    @media (max-width: 860px) {
+      .left-panel  { display: none; }
+      .divider-v   { display: none; }
+      .right-panel { width: 100%; }
+    }
+  </style>
+</head>
+<body>
+
+<!-- ══ PANEL IZQUIERDO ══════════════════════════════ -->
+<div class="left-panel">
+  <div class="left-bg"></div>
+  <div class="left-grad"></div>
+  <div class="left-accent"></div>
+  <div class="grid-lines"></div>
+
+  <!-- Top: logo -->
+  <div class="left-top">
+    <div class="brand-mark">
+      <div class="logo-wrap">
+        <img th:src="@{/images/logo.jpeg}" src="/images/logo.jpeg" alt="Logo"/>
+      </div>
+      <div class="logo-text">
+        <span class="name">Grupo Gadiel S.A.C.</span>
+        <span class="sub">Sistema de Gestión</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom: contenido hero -->
+  <div class="left-bottom">
+    <div class="hero-block">
+      <div class="hero-kicker">
+        <div class="line"></div>
+        <span>Centro automotriz</span>
+      </div>
+
+      <h1 class="hero-title">
+        <span class="stroke">CAR</span><br>
+        <span class="filled">DETAILING</span><br>
+        <span class="red">GADIEL</span>
+      </h1>
+
+      <p class="hero-desc">
+        Sistema de gestión integral para tu centro de car detailing. Control total de órdenes, ventas, inventario y facturación electrónica.
+      </p>
+    </div>
+
+    <div class="features">
+      <span class="chip"><i class="fa-solid fa-soap"></i> Órdenes de lavado</span>
+      <span class="chip"><i class="fa-solid fa-boxes-stacked"></i> Inventario</span>
+      <span class="chip"><i class="fa-solid fa-chart-line"></i> Reportes</span>
+      <span class="chip"><i class="fa-solid fa-file-invoice"></i> Facturación SUNAT</span>
+      <span class="chip"><i class="fa-solid fa-users"></i> Clientes</span>
+      <span class="chip"><i class="fa-solid fa-cash-register"></i> Caja diaria</span>
+    </div>
+
+    <div class="bottom-bar">
+      <div class="location">
+        <i class="fa-solid fa-location-dot"></i>
+        Huamanga, Ayacucho — Perú
+      </div>
+      <span class="version-tag">v2.0 © 2026</span>
+    </div>
+  </div>
+</div>
+
+<!-- ══ DIVISOR ══════════════════════════════════════ -->
+<div class="divider-v"></div>
+
+<!-- ══ PANEL DERECHO ════════════════════════════════ -->
+<div class="right-panel">
+  <div class="right-glow"></div>
+  <div class="deco-circle"></div>
+  <div class="deco-circle-2"></div>
+
+  <div class="login-box">
+
+    <!-- Header -->
+    <div class="login-header">
+      <div class="login-eyebrow">
+        <div class="dot"></div>
+        <span>Acceso al sistema</span>
+      </div>
+      <h2 class="login-title">BIENVENIDO</h2>
+      <p class="login-sub">Ingresa tus credenciales para continuar</p>
+    </div>
+
+<!-- Stats rápidas -->
+<div class="stats-row">
+  <div class="stat-box">
+    <div class="val" id="horaActual">--:--</div>
+    <div class="lbl">Hora</div>
+  </div>
+  <div class="stat-box">
+    <div class="val" id="diaActual">---</div>
+    <div class="lbl">Día</div>
+  </div>
+  <div class="stat-box">
+    <div class="val">AYA</div>
+    <div class="lbl">Región</div>
+  </div>
+</div>
+
+<script>
+  function actualizarHora() {
+    const ahora = new Date();
+    const hora = ahora.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit' });
+    const dia = ahora.toLocaleDateString('es-PE', { weekday: 'short' }).toUpperCase();
+    document.getElementById('horaActual').textContent = hora;
+    document.getElementById('diaActual').textContent = dia;
+  }
+  actualizarHora();
+  setInterval(actualizarHora, 1000);
+</script>
+
+    <!-- Alertas -->
+    <div th:if="${param.logout}" class="alert alert-success">
+      <i class="fa-solid fa-circle-check"></i>
+      Sesión cerrada correctamente.
+    </div>
+    <div th:if="${param.error}" class="alert alert-error">
+      <i class="fa-solid fa-triangle-exclamation"></i>
+      Usuario o contraseña incorrectos.
+    </div>
+
+    <!-- Formulario -->
+    <form method="post" th:action="@{/login}">
+      <div class="fields">
+
+        <div class="field-group">
+          <label class="field-lbl">Usuario</label>
+          <div class="field-wrap">
+            <i class="fa-solid fa-user fi-left"></i>
+            <input type="text" name="username"
+                   placeholder="Ingresa tu usuario"
+                   required autofocus autocomplete="username"/>
+          </div>
+        </div>
+
+        <div class="field-group">
+          <label class="field-lbl">Contraseña</label>
+          <div class="field-wrap">
+            <i class="fa-solid fa-lock fi-left"></i>
+            <input type="password" id="pwd" name="password"
+                   placeholder="••••••••"
+                   required autocomplete="current-password"/>
+            <button type="button" class="eye-btn" onclick="togglePwd()" tabindex="-1">
+              <i class="fa-solid fa-eye" id="eyeIcon"></i>
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <button type="submit" class="btn-submit">
+        <i class="fa-solid fa-right-to-bracket"></i>
+        Ingresar al sistema
+      </button>
+    </form>
+
+    <div class="sep"><span>Car Detailing Gadiel</span></div>
+
+    <div class="login-footer">
+      <span class="copy-txt">© 2026 Gadiel S.A.C.</span>
+      <button class="support-btn" onclick="abrirModal()">
+        <i class="fa-solid fa-headset"></i> Asistencia
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- ══ MODAL SOPORTE ════════════════════════════════ -->
+<div id="modalSoporte" class="modal-overlay">
+  <div class="modal-box">
+    <div class="modal-head">
+      <h3><i class="fa-solid fa-headset"></i> Soporte Técnico</h3>
+      <button class="modal-close" onclick="cerrarModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <div class="contact-item">
+        <div class="contact-ico"><i class="fa-solid fa-envelope"></i></div>
+        <div class="contact-data">
+          <strong>Email</strong>
+          <span>Betmar1899@hotmail.com</span>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-ico"><i class="fa-brands fa-whatsapp"></i></div>
+        <div class="contact-data">
+          <strong>WhatsApp</strong>
+          <span>+51 999 193 213</span>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-ico"><i class="fa-solid fa-phone"></i></div>
+        <div class="contact-data">
+          <strong>Teléfono</strong>
+          <span>+51 999 193 213</span>
+        </div>
+      </div>
+      <div class="contact-item">
+        <div class="contact-ico"><i class="fa-solid fa-clock"></i></div>
+        <div class="contact-data">
+          <strong>Horario de atención</strong>
+          <span>Lun – Sáb: 8:00 AM – 7:00 PM</span>
+        </div>
+      </div>
+    </div>
+    <div class="modal-foot">
+      <button class="btn-ok" onclick="cerrarModal()">Entendido</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function togglePwd() {
+    const input = document.getElementById('pwd');
+    const icon  = document.getElementById('eyeIcon');
+    const isPass = input.type === 'password';
+    input.type = isPass ? 'text' : 'password';
+    icon.className = isPass ? 'fa-solid fa-eye-slash' : 'fa-solid fa-eye';
+  }
+
+  function abrirModal()  { document.getElementById('modalSoporte').classList.add('open'); }
+  function cerrarModal() { document.getElementById('modalSoporte').classList.remove('open'); }
+
+  // Cerrar modal con overlay click o Escape
+  document.getElementById('modalSoporte').addEventListener('click', function(e) {
+    if (e.target === this) cerrarModal();
+  });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') cerrarModal(); });
+</script>
+</body>
+</html>

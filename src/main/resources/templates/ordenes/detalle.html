@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Detalle Orden</title></head>
+<body>
+<th:block layout:fragment="page-title">Detalle de Orden</th:block>
+<th:block layout:fragment="content">
+
+<div th:if="${msg}" class="alert-box success" th:text="${msg}"></div>
+
+<div style="max-width:760px;">
+
+  <!-- Header tarjeta -->
+  <div class="card" style="margin-bottom:16px;">
+    <div style="background:linear-gradient(135deg,var(--accent),#1678a8);padding:24px;color:#fff;border-radius:var(--radius) var(--radius) 0 0;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;">
+        <div>
+          <div style="font-size:12px;opacity:.75;text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Orden de Servicio</div>
+          <div style="font-size:24px;font-weight:800;font-family:'DM Mono',monospace;" th:text="${orden.numeroOrden}"></div>
+        </div>
+        <span th:classappend="${orden.estado=='COMPLETADO'}?'pill-active':(${orden.estado=='EN_PROCESO'}?'pill-info':(${orden.estado=='CANCELADO'}?'pill-critical':'pill-low'))"
+              class="pill" th:text="${orden.estado}" style="font-size:13px;"></span>
+      </div>
+    </div>
+
+    <div style="padding:24px;display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;">
+      <div>
+        <div class="form-label">Placa del vehículo</div>
+        <div style="font-size:18px;font-weight:800;letter-spacing:2px;" th:text="${orden.vehiculo.placa}"></div>
+        <div style="font-size:12px;color:var(--text-muted);" th:text="${orden.vehiculo.marca+' '+orden.vehiculo.modelo}"></div>
+      </div>
+      <div>
+        <div class="form-label">Cliente</div>
+        <div style="font-size:15px;font-weight:600;" th:text="${orden.vehiculo.cliente!=null?orden.vehiculo.cliente.nombre:'Sin cliente'}"></div>
+        <div style="font-size:12px;color:var(--text-muted);" th:if="${orden.vehiculo.cliente!=null}" th:text="${orden.vehiculo.cliente.telefono}"></div>
+      </div>
+      <div>
+        <div class="form-label">Total cobrado</div>
+        <div style="font-size:24px;font-weight:800;color:var(--accent);" th:text="'S/ '+${#numbers.formatDecimal(orden.total,1,'COMMA',2,'POINT')}"></div>
+      </div>
+      <div>
+        <div class="form-label">Servicio</div>
+        <div style="font-weight:600;" th:text="${orden.servicio.nombre}"></div>
+        <span class="spill" th:attr="data-cat=${orden.servicio.categoria}" th:text="${orden.servicio.categoria}"></span>
+      </div>
+      <div>
+        <div class="form-label">Inicio</div>
+        <div th:text="${#temporals.format(orden.fechaInicio,'dd/MM/yyyy HH:mm')}"></div>
+      </div>
+      <div th:if="${orden.fechaFin!=null}">
+        <div class="form-label">Finalización</div>
+        <div th:text="${#temporals.format(orden.fechaFin,'dd/MM/yyyy HH:mm')}"></div>
+      </div>
+    </div>
+
+    <div th:if="${orden.observaciones!=null and !orden.observaciones.isBlank()}"
+         style="margin:0 24px 20px;padding:12px 16px;background:var(--bg-main);border-radius:var(--radius-sm);border-left:3px solid var(--warning);">
+      <div style="font-size:11px;font-weight:700;color:var(--text-muted);text-transform:uppercase;margin-bottom:4px;">Observaciones</div>
+      <div style="font-size:13.5px;" th:text="${orden.observaciones}"></div>
+    </div>
+  </div>
+
+  <!-- Cambio de estado -->
+  <div class="card" style="margin-bottom:16px;">
+    <div class="card-header">
+      <div class="card-title"><div class="dot"></div>Actualizar Estado</div>
+    </div>
+    <div style="padding:16px 24px;">
+      <div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:12px;">
+        <a th:href="@{/ordenes/{id}/cambiar-estado(id=${orden.id},estado='PENDIENTE')}"
+           class="btn btn-warning btn-sm" th:classappend="${orden.estado=='PENDIENTE'}?' active':''">
+          <i class="fa-solid fa-clock"></i> Pendiente
+        </a>
+        <a th:href="@{/ordenes/{id}/cambiar-estado(id=${orden.id},estado='EN_PROCESO')}"
+           class="btn btn-info btn-sm" th:classappend="${orden.estado=='EN_PROCESO'}?' active':''">
+          <i class="fa-solid fa-spinner"></i> En Proceso
+        </a>
+        <a th:href="@{/ordenes/{id}/cambiar-estado(id=${orden.id},estado='COMPLETADO')}"
+           class="btn btn-success btn-sm" th:classappend="${orden.estado=='COMPLETADO'}?' active':''">
+          <i class="fa-solid fa-check"></i> Completado
+        </a>
+        <a th:href="@{/ordenes/{id}/cambiar-estado(id=${orden.id},estado='CANCELADO')}"
+           class="btn btn-outline btn-sm" onclick="return confirm('¿Cancelar esta orden?')">
+          <i class="fa-solid fa-xmark"></i> Cancelado
+        </a>
+      </div>
+      <div style="font-size:12px;color:var(--text-muted);">
+        <i class="fa-solid fa-circle-info" style="color:var(--accent);"></i>
+        El estado actual es: <strong th:text="${orden.estado}"></strong>
+      </div>
+    </div>
+  </div>
+
+  <!-- Acciones -->
+  <div style="display:flex;gap:10px;">
+    <a th:href="@{/sunat/emitir/orden/{id}(id=${orden.id})}" class="btn btn-success">
+            <i class="fa-solid fa-file-invoice"></i> Emitir Comprobante SUNAT
+          </a>
+          <a th:href="@{/ordenes/{id}/pdf(id=${orden.id})}" class="btn btn-primary">
+      <i class="fa-solid fa-file-pdf"></i> Descargar PDF
+    </a>
+    <a th:href="@{/ordenes}" class="btn btn-outline">← Volver a Órdenes</a>
+  </div>
+</div>
+
+</th:block>
+</body>
+</html>

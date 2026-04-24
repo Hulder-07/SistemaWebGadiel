@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Vehículo</title></head>
+<body>
+<th:block layout:fragment="page-title" th:text="${vehiculo.id!=null}?'Editar Vehículo':'Nuevo Vehículo'">Vehículo</th:block>
+<th:block layout:fragment="content">
+<div style="max-width:560px;">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title"><div class="dot"></div>
+        <span th:text="${vehiculo.id!=null}?'Editar Vehículo':'Nuevo Vehículo'"></span>
+      </div>
+    </div>
+    <div style="padding:24px;">
+      <form method="post" th:action="@{/vehiculos/guardar}" th:object="${vehiculo}">
+        <input type="hidden" th:field="*{id}"/>
+        <div class="form-group">
+          <label class="form-label">Placa *</label>
+          <input type="text" th:field="*{placa}" class="form-control" required
+                 placeholder="Ej: ABC-123" style="text-transform:uppercase;font-weight:700;font-size:16px;letter-spacing:2px;"/>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:16px;">
+          <div class="form-group">
+            <label class="form-label">Marca</label>
+            <input type="text" th:field="*{marca}" class="form-control" placeholder="Toyota"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Modelo</label>
+            <input type="text" th:field="*{modelo}" class="form-control" placeholder="Corolla"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Color</label>
+            <input type="text" th:field="*{color}" class="form-control" placeholder="Blanco"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tipo</label>
+            <select th:field="*{tipo}" class="form-control">
+              <option value="sedan">Sedán</option>
+              <option value="suv">SUV</option>
+              <option value="camioneta">Camioneta</option>
+              <option value="pickup">Pick-up</option>
+              <option value="moto">Moto</option>
+              <option value="bus">Bus / Van</option>
+              <option value="otro">Otro</option>
+            </select>
+          </div>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Cliente propietario</label>
+          <select name="clienteId" class="form-control">
+            <option value="">— Sin cliente asignado —</option>
+            <option th:each="c : ${clientes}" th:value="${c.id}"
+                    th:text="${c.nombre}"
+                    th:selected="${vehiculo.cliente!=null and vehiculo.cliente.id==c.id}">
+            </option>
+          </select>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px;">
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Guardar</button>
+          <a th:href="@{/vehiculos}" class="btn btn-outline">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</th:block>
+</body>
+</html>

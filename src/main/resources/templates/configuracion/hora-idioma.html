@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Hora e Idioma - Configuración</title>
+</head>
+<body>
+<th:block layout:fragment="page-title">Hora e Idioma</th:block>
+<th:block layout:fragment="content">
+
+<div style="max-width: 800px; margin: 0 auto;">
+    
+    <!-- Breadcrumb -->
+    <nav style="margin-bottom: 2rem;">
+        <a th:href="@{/configuracion}" style="color: #6b7280; text-decoration: none;">
+            <i class="fas fa-arrow-left"></i> Configuración
+        </a>
+        <span style="color: #6b7280; margin: 0 0.5rem;">/</span>
+        <span>Hora e Idioma</span>
+    </nav>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <div class="dot"></div>
+                <span>Configuración Regional</span>
+            </div>
+        </div>
+        
+        <div style="padding: 2rem;">
+            
+            <!-- Mensajes -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <form method="post" th:action="@{/configuracion/hora-idioma/guardar}" th:object="${config}">
+                
+                <!-- Zona Horaria -->
+                <div class="form-group">
+                    <label class="form-label">🌍 Zona Horaria</label>
+                    <select class="form-control" name="zonaHoraria">
+                        <option value="America/Lima" th:selected="${config.zonaHoraria == 'America/Lima'}">
+                            (GMT-5) Lima, Perú
+                        </option>
+                        <option value="America/New_York" th:selected="${config.zonaHoraria == 'America/New_York'}">
+                            (GMT-5) New York, USA
+                        </option>
+                        <option value="America/Los_Angeles" th:selected="${config.zonaHoraria == 'America/Los_Angeles'}">
+                            (GMT-8) Los Angeles, USA
+                        </option>
+                        <option value="America/Mexico_City" th:selected="${config.zonaHoraria == 'America/Mexico_City'}">
+                            (GMT-6) Ciudad de México
+                        </option>
+                        <option value="America/Bogota" th:selected="${config.zonaHoraria == 'America/Bogota'}">
+                            (GMT-5) Bogotá, Colombia
+                        </option>
+                        <option value="America/Santiago" th:selected="${config.zonaHoraria == 'America/Santiago'}">
+                            (GMT-4) Santiago, Chile
+                        </option>
+                        <option value="America/Buenos_Aires" th:selected="${config.zonaHoraria == 'America/Buenos_Aires'}">
+                            (GMT-3) Buenos Aires, Argentina
+                        </option>
+                        <option value="Europe/Madrid" th:selected="${config.zonaHoraria == 'Europe/Madrid'}">
+                            (GMT+1) Madrid, España
+                        </option>
+                    </select>
+                    <small style="color: #6b7280;">La hora del sistema se ajustará a esta zona</small>
+                </div>
+
+                <!-- Formato de Fecha -->
+                <div class="form-group">
+                    <label class="form-label">📅 Formato de Fecha</label>
+                    <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                        
+                        <label class="format-card">
+                            <input type="radio" 
+                                   name="formatoFecha" 
+                                   value="DD/MM/YYYY"
+                                   th:checked="${config.formatoFecha == 'DD/MM/YYYY'}">
+                            <div>
+                                <strong>DD/MM/YYYY</strong>
+                                <p>21/03/2026</p>
+                            </div>
+                        </label>
+
+                        <label class="format-card">
+                            <input type="radio" 
+                                   name="formatoFecha" 
+                                   value="MM/DD/YYYY"
+                                   th:checked="${config.formatoFecha == 'MM/DD/YYYY'}">
+                            <div>
+                                <strong>MM/DD/YYYY</strong>
+                                <p>03/21/2026</p>
+                            </div>
+                        </label>
+
+                        <label class="format-card">
+                            <input type="radio" 
+                                   name="formatoFecha" 
+                                   value="YYYY-MM-DD"
+                                   th:checked="${config.formatoFecha == 'YYYY-MM-DD'}">
+                            <div>
+                                <strong>YYYY-MM-DD</strong>
+                                <p>2026-03-21</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Formato de Hora -->
+                <div class="form-group">
+                    <label class="form-label">🕐 Formato de Hora</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        
+                        <label class="format-card">
+                            <input type="radio" 
+                                   name="formatoHora" 
+                                   value="24h"
+                                   th:checked="${config.formatoHora == '24h'}">
+                            <div>
+                                <i class="fas fa-clock" style="font-size: 2rem; color: #dc2626; margin-bottom: 0.5rem;"></i>
+                                <strong>24 horas</strong>
+                                <p>14:30, 23:45</p>
+                            </div>
+                        </label>
+
+                        <label class="format-card">
+                            <input type="radio" 
+                                   name="formatoHora" 
+                                   value="12h"
+                                   th:checked="${config.formatoHora == '12h'}">
+                            <div>
+                                <i class="fas fa-clock" style="font-size: 2rem; color: #dc2626; margin-bottom: 0.5rem;"></i>
+                                <strong>12 horas (AM/PM)</strong>
+                                <p>2:30 PM, 11:45 PM</p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Idioma -->
+                <div class="form-group">
+                    <label class="form-label">🗣️ Idioma del Sistema</label>
+                    <select class="form-control" name="idioma">
+                        <option value="es" th:selected="${config.idioma == 'es'}">
+                            🇪🇸 Español
+                        </option>
+                        <option value="en" th:selected="${config.idioma == 'en'}">
+                            🇺🇸 English
+                        </option>
+                    </select>
+                    <small style="color: #6b7280;">Requiere reiniciar la aplicación</small>
+                </div>
+
+                <!-- Moneda -->
+                <div class="form-group">
+                    <label class="form-label">💰 Moneda</label>
+                    <select class="form-control" name="moneda">
+                        <option value="PEN" th:selected="${config.moneda == 'PEN'}">
+                            🇵🇪 Soles Peruanos (S/)
+                        </option>
+                        <option value="USD" th:selected="${config.moneda == 'USD'}">
+                            🇺🇸 Dólares Americanos ($)
+                        </option>
+                        <option value="EUR" th:selected="${config.moneda == 'EUR'}">
+                            🇪🇺 Euros (€)
+                        </option>
+                        <option value="MXN" th:selected="${config.moneda == 'MXN'}">
+                            🇲🇽 Pesos Mexicanos (MX$)
+                        </option>
+                        <option value="COP" th:selected="${config.moneda == 'COP'}">
+                            🇨🇴 Pesos Colombianos (COP$)
+                        </option>
+                    </select>
+                </div>
+
+                <!-- Vista Previa -->
+                <div style="background: #f9fafb; padding: 1.5rem; border-radius: 12px; margin-top: 2rem;">
+                    <h4 style="margin: 0 0 1rem;">Vista Previa</h4>
+                    <div style="background: white; padding: 1.5rem; border-radius: 8px;">
+                        <p style="margin: 0;">
+                            <strong>Fecha actual:</strong> 
+                            <span id="previewFecha">21/03/2026</span>
+                        </p>
+                        <p style="margin: 0.5rem 0 0;">
+                            <strong>Hora actual:</strong> 
+                            <span id="previewHora">14:30</span>
+                        </p>
+                        <p style="margin: 0.5rem 0 0;">
+                            <strong>Precio ejemplo:</strong> 
+                            <span id="previewMoneda">S/ 150.00</span>
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                    <a th:href="@{/configuracion}" class="btn btn-outline">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.format-card {
+    cursor: pointer;
+}
+
+.format-card input {
+    display: none;
+}
+
+.format-card > div {
+    padding: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.format-card input:checked + div {
+    border-color: #dc2626;
+    background: #fef2f2;
+}
+
+.format-card strong {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.format-card p {
+    margin: 0;
+    color: #6b7280;
+    font-size: 0.875rem;
+}
+</style>
+
+<script>
+// Actualizar vista previa
+function actualizarPreview() {
+    const formatoFecha = document.querySelector('input[name="formatoFecha"]:checked')?.value || 'DD/MM/YYYY';
+    const formatoHora = document.querySelector('input[name="formatoHora"]:checked')?.value || '24h';
+    const moneda = document.querySelector('select[name="moneda"]').value;
+    
+    const now = new Date();
+    
+    // Fecha
+    let fechaStr;
+    if (formatoFecha === 'DD/MM/YYYY') {
+        fechaStr = `${now.getDate().toString().padStart(2, '0')}/${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getFullYear()}`;
+    } else if (formatoFecha === 'MM/DD/YYYY') {
+        fechaStr = `${(now.getMonth() + 1).toString().padStart(2, '0')}/${now.getDate().toString().padStart(2, '0')}/${now.getFullYear()}`;
+    } else {
+        fechaStr = `${now.getFullYear()}-${(now.getMonth() + 1).toString().padStart(2, '0')}-${now.getDate().toString().padStart(2, '0')}`;
+    }
+    
+    // Hora
+    let horaStr;
+    if (formatoHora === '24h') {
+        horaStr = `${now.getHours().toString().padStart(2, '0')}:${now.getMinutes().toString().padStart(2, '0')}`;
+    } else {
+        const hours = now.getHours();
+        const ampm = hours >= 12 ? 'PM' : 'AM';
+        const hours12 = hours % 12 || 12;
+        horaStr = `${hours12}:${now.getMinutes().toString().padStart(2, '0')} ${ampm}`;
+    }
+    
+    // Moneda
+    const simbolos = {
+        'PEN': 'S/',
+        'USD': '$',
+        'EUR': '€',
+        'MXN': 'MX$',
+        'COP': 'COP$'
+    };
+    const monedaStr = `${simbolos[moneda] || 'S/'} 150.00`;
+    
+    document.getElementById('previewFecha').textContent = fechaStr;
+    document.getElementById('previewHora').textContent = horaStr;
+    document.getElementById('previewMoneda').textContent = monedaStr;
+}
+
+// Escuchar cambios
+document.querySelectorAll('input[name="formatoFecha"], input[name="formatoHora"]').forEach(input => {
+    input.addEventListener('change', actualizarPreview);
+});
+document.querySelector('select[name="moneda"]').addEventListener('change', actualizarPreview);
+
+// Inicializar
+actualizarPreview();
+</script>
+
+</th:block>
+</body>
+</html>

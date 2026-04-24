@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Sistema - Configuración</title>
+</head>
+<body>
+<th:block layout:fragment="page-title">Sistema</th:block>
+<th:block layout:fragment="content">
+
+<div style="max-width: 800px; margin: 0 auto;">
+    
+    <!-- Breadcrumb -->
+    <nav style="margin-bottom: 2rem;">
+        <a th:href="@{/configuracion}" style="color: #6b7280; text-decoration: none;">
+            <i class="fas fa-arrow-left"></i> Configuración
+        </a>
+        <span style="color: #6b7280; margin: 0 0.5rem;">/</span>
+        <span>Sistema</span>
+    </nav>
+
+    <!-- Card principal -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <div class="dot"></div>
+                <span>Datos del Negocio</span>
+            </div>
+        </div>
+        
+        <div style="padding: 2rem;">
+            
+            <!-- Mensajes -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+            
+            <div th:if="${error}" class="alert alert-danger alert-dismissible fade show">
+                <span th:text="${error}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Formulario -->
+            <form method="post" th:action="@{/configuracion/sistema/guardar}" th:object="${config}">
+                
+                <!-- Nombre del Negocio -->
+                <div class="form-group">
+                    <label class="form-label">🏢 Nombre del Negocio *</label>
+                    <input type="text" 
+                           class="form-control" 
+                           name="nombreNegocio"
+                           th:value="${config.nombreNegocio}"
+                           placeholder="Ej: Car Detailing Gadiel"
+                           required>
+                </div>
+
+                <!-- RUC -->
+                <div class="form-group">
+                    <label class="form-label">🆔 RUC *</label>
+                    <input type="text" 
+                           class="form-control" 
+                           name="ruc"
+                           th:value="${config.ruc}"
+                           placeholder="20615184421"
+                           maxlength="11"
+                           pattern="\d{11}"
+                           required>
+                    <small style="color: #6b7280;">11 dígitos numéricos</small>
+                </div>
+
+                <!-- Dirección -->
+                <div class="form-group">
+                    <label class="form-label">📍 Dirección</label>
+                    <input type="text" 
+                           class="form-control" 
+                           name="direccion"
+                           th:value="${config.direccion}"
+                           placeholder="Av. Principal 123, Ayacucho">
+                </div>
+
+                <!-- Teléfono y Email -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div class="form-group">
+                        <label class="form-label">📱 Teléfono</label>
+                        <input type="tel" 
+                               class="form-control" 
+                               name="telefono"
+                               th:value="${config.telefono}"
+                               placeholder="999123456"
+                               maxlength="15">
+                    </div>
+
+                    <div class="form-group">
+                        <label class="form-label">📧 Email</label>
+                        <input type="email" 
+                               class="form-control" 
+                               name="email"
+                               th:value="${config.email}"
+                               placeholder="contacto@negocio.com">
+                    </div>
+                </div>
+
+                <!-- Logo (pendiente subida de archivos) -->
+                <div class="form-group">
+                    <label class="form-label">🖼️ Logo</label>
+                    <div style="padding: 2rem; border: 2px dashed #e5e7eb; border-radius: 8px; text-align: center;">
+                        <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: #9ca3af;"></i>
+                        <p style="margin: 1rem 0 0; color: #6b7280;">
+                            Arrastra una imagen o haz clic para seleccionar
+                        </p>
+                        <small style="color: #9ca3af;">PNG, JPG (máx. 2MB)</small>
+                        <input type="file" 
+                               accept="image/*" 
+                               style="display: none;" 
+                               id="logoInput">
+                    </div>
+                </div>
+
+                <!-- Botones -->
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Cambios
+                    </button>
+                    <a th:href="@{/configuracion}" class="btn btn-outline">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+// Click en área de logo abre selector de archivos
+document.querySelector('div[style*="dashed"]').addEventListener('click', function() {
+    document.getElementById('logoInput').click();
+});
+</script>
+
+</th:block>
+</body>
+</html>

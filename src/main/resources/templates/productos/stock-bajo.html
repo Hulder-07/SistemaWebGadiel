@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Stock Bajo</title>
+</head>
+<body>
+<th:block layout:fragment="page-title">Alerta de Stock</th:block>
+
+<th:block layout:fragment="content">
+    <!-- Tarjeta de resumen -->
+    <div class="stats-grid" style="grid-template-columns:repeat(3,1fr); margin-bottom:24px;">
+        <div class="stat-card">
+            <div class="stat-icon warning"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            <div class="stat-body">
+                <div class="stat-value" th:text="${productos.size()}">0</div>
+                <div class="stat-label">Productos con stock bajo</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Lista de productos con stock bajo -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title"><div class="dot" style="background:var(--warning)"></div>Productos con Stock Bajo</div>
+            <a th:href="@{/productos}" class="card-action">Ver todos →</a>
+        </div>
+        <div class="card-body" style="padding:0;">
+            <!-- Mensaje si no hay productos -->
+            <div th:if="${productos.isEmpty()}" class="empty-state" style="padding:40px; text-align:center;">
+                <i class="fa-solid fa-check-circle" style="font-size:48px; color:var(--success); opacity:0.5;"></i>
+                <p style="margin-top:10px; color:var(--text-muted);">No hay productos con stock bajo</p>
+            </div>
+
+            <!-- Lista de productos -->
+            <div th:each="p : ${productos}" class="stock-item" th:if="${!productos.isEmpty()}">
+                <div class="stock-header">
+                    <span th:text="${p.nombre}" style="font-weight:500;"></span>
+                    <span th:text="${p.stock}+' '+(p.unidad!=null?p.unidad:'')"
+                          th:style="'color:'+(${p.stock==0}?'var(--danger)':'var(--warning)')+'; font-weight:700;'"></span>
+                </div>
+                <div class="stock-bar-bg">
+                    <div class="stock-bar-fill"
+                         th:style="'width:'+${p.stockMinimo>0?(p.stock*100/p.stockMinimo):0}+'%; background:'+(${p.stock==0}?'var(--danger)':'var(--warning)')"></div>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-top:4px; font-size:11px; color:var(--text-muted);">
+                    <span>Stock mínimo: <span th:text="${p.stockMinimo}"></span></span>
+                    <span>Precio: S/ <span th:text="${#numbers.formatDecimal(p.precio,1,'COMMA',2,'POINT')}"></span></span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Botón para volver -->
+    <div style="margin-top:20px;">
+        <a th:href="@{/productos}" class="btn btn-outline">
+            <i class="fa-solid fa-arrow-left"></i> Volver a Productos
+        </a>
+    </div>
+</th:block>
+</body>
+</html>

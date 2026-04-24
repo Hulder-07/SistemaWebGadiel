@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Nuevo Usuario</title></head>
+<body>
+<th:block layout:fragment="page-title">Nuevo Usuario</th:block>
+<th:block layout:fragment="content">
+<div th:if="${error}" class="alert-box danger" th:text="${error}"></div>
+<div style="max-width:500px;">
+  <div class="card">
+    <div class="card-header"><div class="card-title"><div class="dot"></div>Crear Usuario</div></div>
+    <div style="padding:24px;">
+      <form method="post" th:action="@{/usuarios/guardar}">
+        <div class="form-group">
+          <label class="form-label">Username *</label>
+          <input type="text" name="username" class="form-control" required placeholder="Ej: cajero2"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Nombre completo</label>
+          <input type="text" name="nombre" class="form-control" placeholder="Ej: María García"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Contraseña *</label>
+          <input type="password" name="password" class="form-control" required placeholder="Mínimo 6 caracteres"/>
+        </div>
+        <div class="form-group">
+          <label class="form-label">Roles *</label>
+          <div style="display:flex;flex-direction:column;gap:8px;padding:12px;background:var(--bg-main);border-radius:var(--radius-sm);">
+            <label th:each="r : ${roles}" style="display:flex;align-items:center;gap:8px;cursor:pointer;">
+              <input type="checkbox" name="rolesIds" th:value="${r.id}"/>
+              <span th:text="${r.nombre}" style="font-weight:600;"></span>
+            </label>
+          </div>
+        </div>
+        <div style="display:flex;gap:12px;margin-top:8px;">
+          <button type="submit" class="btn btn-primary"><i class="fa-solid fa-user-plus"></i> Crear Usuario</button>
+          <a th:href="@{/usuarios}" class="btn btn-outline">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+</th:block>
+</body>
+</html>

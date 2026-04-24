@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Facturación - Configuración</title>
+</head>
+<body>
+<th:block layout:fragment="page-title">Facturación Electrónica</th:block>
+<th:block layout:fragment="content">
+
+<div style="max-width: 800px; margin: 0 auto;">
+    
+    <!-- Breadcrumb -->
+    <nav style="margin-bottom: 2rem;">
+        <a th:href="@{/configuracion}" style="color: #6b7280; text-decoration: none;">
+            <i class="fas fa-arrow-left"></i> Configuración
+        </a>
+        <span style="color: #6b7280; margin: 0 0.5rem;">/</span>
+        <span>Facturación</span>
+    </nav>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <div class="dot"></div>
+                <span>Configuración SUNAT / NubeFact</span>
+            </div>
+        </div>
+        
+        <div style="padding: 2rem;">
+            
+            <!-- Mensajes -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <!-- Estado -->
+            <div style="background: #f0f9ff; border-left: 4px solid #3b82f6; padding: 1rem; margin-bottom: 2rem; border-radius: 4px;">
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <i class="fas fa-info-circle" style="color: #3b82f6;"></i>
+                    <strong>Estado:</strong>
+                    <span th:text="${config.facturacionActiva ? '✅ Activo' : '⚠️ Inactivo'}">
+                        ⚠️ Inactivo
+                    </span>
+                </div>
+            </div>
+
+            <form method="post" th:action="@{/configuracion/facturacion/guardar}" th:object="${config}">
+                
+                <!-- Token NubeFact -->
+                <div class="form-group">
+                    <label class="form-label">🔑 Token NubeFact *</label>
+                    <div class="input-group">
+                        <input type="password" 
+                               class="form-control" 
+                               name="nubefactToken"
+                               id="tokenInput"
+                               th:value="${config.nubefactToken}"
+                               placeholder="••••••••••••••••••••"
+                               required>
+                        <button type="button" 
+                                class="btn btn-outline" 
+                                onclick="toggleToken()">
+                            <i class="fas fa-eye" id="toggleIcon"></i>
+                        </button>
+                    </div>
+                    <small style="color: #6b7280;">
+                        Obtén tu token en: 
+                        <a href="https://nubefact.com/" target="_blank">nubefact.com</a>
+                    </small>
+                </div>
+
+                <!-- Modo -->
+                <div class="form-group">
+                    <label class="form-label">⚙️ Modo de Operación *</label>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                        
+                        <label class="radio-card" for="modo-beta">
+                            <input type="radio" 
+                                   id="modo-beta" 
+                                   name="nubefactModo" 
+                                   value="beta"
+                                   th:checked="${config.nubefactModo == 'beta'}">
+                            <div>
+                                <i class="fas fa-flask" style="font-size: 2rem; color: #f59e0b; display: block; margin-bottom: 0.5rem;"></i>
+                                <strong>Pruebas (Beta)</strong>
+                                <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: #6b7280;">
+                                    Para testing y desarrollo
+                                </p>
+                            </div>
+                        </label>
+
+                        <label class="radio-card" for="modo-produccion">
+                            <input type="radio" 
+                                   id="modo-produccion" 
+                                   name="nubefactModo" 
+                                   value="produccion"
+                                   th:checked="${config.nubefactModo == 'produccion'}">
+                            <div>
+                                <i class="fas fa-check-circle" style="font-size: 2rem; color: #10b981; display: block; margin-bottom: 0.5rem;"></i>
+                                <strong>Producción</strong>
+                                <p style="margin: 0.5rem 0 0; font-size: 0.875rem; color: #6b7280;">
+                                    Comprobantes válidos ante SUNAT
+                                </p>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Series -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem;">
+                    
+                    <!-- Serie Boletas -->
+                    <div class="form-group">
+                        <label class="form-label">📄 Serie de Boletas *</label>
+                        <input type="text" 
+                               class="form-control" 
+                               name="serieBoleta"
+                               th:value="${config.serieBoleta}"
+                               placeholder="B001"
+                               pattern="B\d{3}"
+                               maxlength="4"
+                               required>
+                        <small style="color: #6b7280;">Formato: B001, B002...</small>
+                    </div>
+
+                    <!-- Serie Facturas -->
+                    <div class="form-group">
+                        <label class="form-label">📄 Serie de Facturas *</label>
+                        <input type="text" 
+                               class="form-control" 
+                               name="serieFactura"
+                               th:value="${config.serieFactura}"
+                               placeholder="F001"
+                               pattern="F\d{3}"
+                               maxlength="4"
+                               required>
+                        <small style="color: #6b7280;">Formato: F001, F002...</small>
+                    </div>
+                </div>
+
+                <!-- Información adicional -->
+                <div style="background: #fffbeb; border: 1px solid #fcd34d; padding: 1rem; border-radius: 8px; margin-top: 1.5rem;">
+                    <h4 style="margin: 0 0 0.5rem; font-size: 1rem; display: flex; align-items: center; gap: 0.5rem;">
+                        <i class="fas fa-lightbulb" style="color: #f59e0b;"></i>
+                        Importante
+                    </h4>
+                    <ul style="margin: 0; padding-left: 1.5rem; color: #92400e;">
+                        <li>El RUC configurado es: <strong th:text="${config.ruc}">20615184421</strong></li>
+                        <li>Asegúrate de usar el token correcto según el modo seleccionado</li>
+                        <li>En modo Producción, los comprobantes se envían directamente a SUNAT</li>
+                        <li>Las series deben estar registradas en NubeFact</li>
+                    </ul>
+                </div>
+
+                <!-- Botones -->
+                <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fas fa-save"></i> Guardar Configuración
+                    </button>
+                    <button type="button" class="btn btn-outline" onclick="probarConexion()">
+                        <i class="fas fa-vial"></i> Probar Conexión
+                    </button>
+                    <a th:href="@{/configuracion}" class="btn btn-outline">
+                        Cancelar
+                    </a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<style>
+.radio-card {
+    cursor: pointer;
+}
+
+.radio-card input {
+    display: none;
+}
+
+.radio-card > div {
+    padding: 1.5rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 12px;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.radio-card input:checked + div {
+    border-color: #dc2626;
+    background: #fef2f2;
+}
+
+.input-group {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.input-group .form-control {
+    flex: 1;
+}
+</style>
+
+<script>
+function toggleToken() {
+    const input = document.getElementById('tokenInput');
+    const icon = document.getElementById('toggleIcon');
+    
+    if (input.type === 'password') {
+        input.type = 'text';
+        icon.classList.remove('fa-eye');
+        icon.classList.add('fa-eye-slash');
+    } else {
+        input.type = 'password';
+        icon.classList.remove('fa-eye-slash');
+        icon.classList.add('fa-eye');
+    }
+}
+
+function probarConexion() {
+    // TODO: Implementar prueba de conexión con AJAX
+    alert('⏳ Probando conexión con NubeFact...');
+}
+</script>
+
+</th:block>
+</body>
+</html>

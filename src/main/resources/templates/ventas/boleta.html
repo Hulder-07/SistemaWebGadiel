@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Boleta</title></head>
+<body>
+<th:block layout:fragment="page-title">Boleta de Venta</th:block>
+<th:block layout:fragment="content">
+
+<div style="max-width:640px;margin:0 auto;">
+  <div class="card">
+    <!-- Cabecera boleta -->
+    <div style="background:var(--accent);padding:24px;color:#fff;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <div style="font-size:20px;font-weight:800;"><i class="fa-solid fa-car-wash"></i> CarWash System</div>
+        <div style="font-size:13px;opacity:.8;">Lavado &amp; Tienda Automotriz</div>
+      </div>
+      <div style="text-align:right;">
+        <div style="font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:1px;">Boleta de Venta</div>
+        <div style="font-size:16px;font-weight:700;" th:text="${numeroBoleta}"></div>
+      </div>
+    </div>
+
+    <div style="padding:24px;">
+      <!-- Datos cliente -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:20px;padding:16px;background:var(--bg-main);border-radius:var(--radius-sm);">
+        <div>
+          <div class="form-label">Cliente</div>
+          <div style="font-weight:600;" th:text="${cliente}"></div>
+        </div>
+        <div>
+          <div class="form-label">Fecha</div>
+          <div th:text="${#temporals.format(fecha,'dd/MM/yyyy HH:mm')}"></div>
+        </div>
+      </div>
+
+      <!-- Tabla items -->
+      <table style="margin-bottom:16px;">
+        <thead>
+          <tr><th>Producto</th><th>Cant.</th><th>Precio Unit.</th><th>Total</th></tr>
+        </thead>
+        <tbody>
+          <tr th:each="v : ${ventas}">
+            <td th:text="${v.producto.nombre}"></td>
+            <td th:text="${v.cantidad}"></td>
+            <td th:text="'S/ '+${#numbers.formatDecimal(v.precioUnitario,1,'COMMA',2,'POINT')}"></td>
+            <td><strong th:text="'S/ '+${#numbers.formatDecimal(v.total,1,'COMMA',2,'POINT')}"></strong></td>
+          </tr>
+        </tbody>
+      </table>
+
+      <!-- Total -->
+      <div style="display:flex;justify-content:flex-end;margin-bottom:24px;">
+        <div style="background:var(--accent);color:#fff;padding:12px 24px;border-radius:var(--radius-sm);text-align:right;">
+          <div style="font-size:12px;opacity:.8;">TOTAL A PAGAR</div>
+          <div style="font-size:24px;font-weight:800;" th:text="'S/ '+${#numbers.formatDecimal(total,1,'COMMA',2,'POINT')}"></div>
+        </div>
+      </div>
+
+      <!-- Acciones -->
+      <div style="display:flex;gap:10px;">
+        <a th:href="@{/sunat/emitir/venta/{b}(b=${numeroBoleta})}" class="btn btn-success">
+          <i class="fa-solid fa-file-invoice"></i> Emitir Comprobante SUNAT
+        </a>
+        <a th:href="@{/ventas/boleta/{b}/pdf(b=${numeroBoleta})}" class="btn btn-primary">
+          <i class="fa-solid fa-file-pdf"></i> Descargar PDF
+        </a>
+        <a th:href="@{/ventas/nueva}" class="btn btn-outline">
+          <i class="fa-solid fa-cart-plus"></i> Nueva Venta
+        </a>
+        <a th:href="@{/ventas}" class="btn btn-outline">← Volver</a>
+      </div>
+    </div>
+  </div>
+</div>
+
+</th:block>
+</body>
+</html>

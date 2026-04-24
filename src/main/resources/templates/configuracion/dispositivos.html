@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Copias de Seguridad - Configuración</title>
+</head>
+<body>
+<th:block layout:fragment="page-title">Copias de Seguridad</th:block>
+<th:block layout:fragment="content">
+
+<div style="max-width: 900px; margin: 0 auto;">
+    
+    <!-- Breadcrumb -->
+    <nav style="margin-bottom: 2rem;">
+        <a th:href="@{/configuracion}" style="color: #6b7280; text-decoration: none;">
+            <i class="fas fa-arrow-left"></i> Configuración
+        </a>
+        <span style="color: #6b7280; margin: 0 0.5rem;">/</span>
+        <span>Copias de Seguridad</span>
+    </nav>
+
+    <!-- Estado del último backup -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <div style="padding: 1.5rem;">
+            <div style="display: flex; align-items: center; justify-content: between; gap: 2rem;">
+                <div style="flex: 1;">
+                    <h3 style="margin: 0 0 0.5rem; font-size: 1.125rem;">Último Backup</h3>
+                    <p style="margin: 0; color: #6b7280;" th:if="${config.ultimoBackup != null}">
+                        <i class="fas fa-clock"></i>
+                        <span th:text="${#temporals.format(config.ultimoBackup, 'dd/MM/yyyy HH:mm')}">21/03/2026 14:30</span>
+                    </p>
+                    <p style="margin: 0; color: #dc2626;" th:if="${config.ultimoBackup == null}">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        No hay backups registrados
+                    </p>
+                </div>
+                <div style="text-align: right;">
+                    <i class="fas fa-database" style="font-size: 3rem; color: #e5e7eb;"></i>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Backup Manual -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-header">
+            <div class="card-title">
+                <div class="dot"></div>
+                <span>Backup Manual</span>
+            </div>
+        </div>
+        
+        <div style="padding: 2rem;">
+            
+            <!-- Mensajes -->
+            <div th:if="${success}" class="alert alert-success alert-dismissible fade show">
+                <span th:text="${success}"></span>
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+
+            <p style="color: #6b7280; margin-bottom: 1.5rem;">
+                Descarga una copia de seguridad completa de toda la base de datos. 
+                Incluye clientes, servicios, órdenes, productos, ventas y configuración.
+            </p>
+
+            <form method="post" th:action="@{/configuracion/copias-seguridad/descargar}">
+                <button type="submit" class="btn btn-primary" style="width: 100%;">
+                    <i class="fas fa-download"></i> Descargar Backup Ahora
+                </button>
+            </form>
+
+            <div style="background: #fffbeb; border: 1px solid #fcd34d; padding: 1rem; border-radius: 8px; margin-top: 1.5rem;">
+                <p style="margin: 0; color: #92400e; font-size: 0.875rem;">
+                    <i class="fas fa-info-circle"></i>
+                    <strong>Importante:</strong> El backup se descargará como archivo SQL. 
+                    Guárdalo en un lugar seguro.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Restaurar Backup -->
+    <div class="card" style="margin-bottom: 2rem;">
+        <div class="card-header">
+            <div class="card-title">
+                <div class="dot"></div>
+                <span>Restaurar Backup</span>
+            </div>
+        </div>
+        
+        <div style="padding: 2rem;">
+            <p style="color: #6b7280; margin-bottom: 1.5rem;">
+                Restaura la base de datos desde un archivo de backup previo.
+            </p>
+
+            <div style="border: 2px dashed #e5e7eb; border-radius: 12px; padding: 2rem; text-align: center;">
+                <i class="fas fa-cloud-upload-alt" style="font-size: 3rem; color: #9ca3af; margin-bottom: 1rem;"></i>
+                <p style="margin: 0 0 1rem; color: #6b7280;">
+                    Selecciona un archivo de backup (.sql)
+                </p>
+                <input type="file" 
+                       accept=".sql" 
+                       id="backupFile"
+                       style="display: none;">
+                <button type="button" 
+                        class="btn btn-outline"
+                        onclick="document.getElementById('backupFile').click()">
+                    <i class="fas fa-file-upload"></i> Seleccionar Archivo
+                </button>
+            </div>
+
+            <div style="background: #fef2f2; border: 1px solid #fca5a5; padding: 1rem; border-radius: 8px; margin-top: 1.5rem;">
+                <p style="margin: 0; color: #991b1b; font-size: 0.875rem;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>¡Precaución!</strong> Restaurar un backup eliminará todos los datos actuales 
+                    y los reemplazará con los del archivo. Esta acción no se puede deshacer.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Configuración Automática -->
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <div class="dot"></div>
+                <span>Backup Automático</span>
+            </div>
+        </div>
+        
+        <div style="padding: 2rem;">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1.5rem;">
+                <div>
+                    <h4 style="margin: 0; font-size: 1rem;">Activar backups automáticos</h4>
+                    <p style="margin: 0.25rem 0 0; color: #6b7280; font-size: 0.875rem;">
+                        Se ejecutarán según la frecuencia seleccionada
+                    </p>
+                </div>
+                <label class="switch">
+                    <input type="checkbox" th:checked="${config.backupAutomatico}">
+                    <span class="slider"></span>
+                </label>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Frecuencia</label>
+                <select class="form-control">
+                    <option value="diario" th:selected="${config.frecuenciaBackup == 'diario'}">
+                        Diario (cada 24 horas)
+                    </option>
+                    <option value="semanal" th:selected="${config.frecuenciaBackup == 'semanal'}">
+                        Semanal (cada lunes)
+                    </option>
+                    <option value="mensual" th:selected="${config.frecuenciaBackup == 'mensual'}">
+                        Mensual (día 1 de cada mes)
+                    </option>
+                </select>
+            </div>
+
+            <div class="form-group">
+                <label class="form-label">Hora de Ejecución</label>
+                <input type="time" 
+                       class="form-control" 
+                       value="03:00"
+                       style="max-width: 200px;">
+                <small style="color: #6b7280;">
+                    Se recomienda programar en horarios de baja actividad (madrugada)
+                </small>
+            </div>
+
+            <button type="button" class="btn btn-primary">
+                <i class="fas fa-save"></i> Guardar Configuración
+            </button>
+        </div>
+    </div>
+
+</div>
+
+<style>
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #10b981;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+</style>
+
+<script>
+// Manejar selección de archivo
+document.getElementById('backupFile').addEventListener('change', function() {
+    if (this.files.length > 0) {
+        const fileName = this.files[0].name;
+        if (confirm(`¿Estás seguro de restaurar el backup desde "${fileName}"?\n\n⚠️ Esto eliminará todos los datos actuales.`)) {
+            // TODO: Implementar subida y restauración
+            alert('⏳ Restaurando backup...\n\nEsta funcionalidad estará disponible próximamente.');
+        } else {
+            this.value = '';
+        }
+    }
+});
+</script>
+
+</th:block>
+</body>
+</html>

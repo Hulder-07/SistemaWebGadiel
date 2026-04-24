@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Reportes</title></head>
+<body>
+<div layout:fragment="page-title">Reportes y Exportaciones</div>
+<div layout:fragment="content">
+
+<!-- NUEVA SECCIÓN: Vistas de Reportes -->
+<div style="margin-bottom:28px;">
+    <div style="display:flex; gap:16px; align-items:center; margin-bottom:16px;">
+    <div style="font-size:20px;font-weight:800;color:var(--text-primary);font-family:var(--font-display);letter-spacing:-.4px;">Visualizar Reportes</div>
+        <span style="background:var(--accent-glow); color:var(--accent); padding:4px 12px; border-radius:20px; font-size:12px; font-weight:600;">NUEVO</span>
+    </div>
+    <div class="quick-grid" style="grid-template-columns:repeat(2,1fr); max-width:500px;">
+        <a href="/reportes/lavados" class="qa-card" style="background:var(--accent); color:white;">
+            <div class="qa-icon" style="background:rgba(255,255,255,0.2);"><i class="fa-solid fa-chart-bar"></i></div>
+            <div class="qa-label" style="color:white;">Reporte de Lavados</div>
+        </a>
+        <a href="/reportes/estadisticas" class="qa-card" style="background:#2980b9; color:white;">
+            <div class="qa-icon" style="background:rgba(255,255,255,0.2);"><i class="fa-solid fa-chart-pie"></i></div>
+            <div class="qa-label" style="color:white;">Estadísticas</div>
+        </a>
+    </div>
+</div>
+
+<!-- Tarjetas de exportación (tu contenido actual) -->
+<div class="stats-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:28px;">
+
+  <!-- Lavados / Órdenes -->
+  <div class="card" style="padding:0;overflow:visible;">
+    <div style="background:var(--accent);padding:20px 24px;border-radius:var(--radius) var(--radius) 0 0;color:#fff;">
+      <i class="fa-solid fa-soap" style="font-size:28px;margin-bottom:8px;display:block;"></i>
+      <div style="font-size:16px;font-weight:700;">Órdenes de Servicio</div>
+      <div style="font-size:12px;opacity:.8;margin-top:2px;">Reporte de lavados realizados</div>
+    </div>
+    <div style="padding:16px 24px;display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Exportar PDF</div>
+      <a th:href="@{/reportes/pdf/ordenes(periodo='diario')}"   class="btn btn-outline btn-sm"><i class="fa-solid fa-file-pdf"></i> Diario</a>
+      <a th:href="@{/reportes/pdf/ordenes(periodo='semanal')}"  class="btn btn-outline btn-sm"><i class="fa-solid fa-file-pdf"></i> Semanal</a>
+      <a th:href="@{/reportes/pdf/ordenes(periodo='mensual')}"  class="btn btn-outline btn-sm"><i class="fa-solid fa-file-pdf"></i> Mensual</a>
+      <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:8px 0 4px;">Exportar Excel</div>
+      <a th:href="@{/reportes/excel/ordenes(periodo='diario')}"  class="btn btn-outline btn-sm"><i class="fa-solid fa-file-excel" style="color:#27ae60;"></i> Diario</a>
+      <a th:href="@{/reportes/excel/ordenes(periodo='semanal')}" class="btn btn-outline btn-sm"><i class="fa-solid fa-file-excel" style="color:#27ae60;"></i> Semanal</a>
+      <a th:href="@{/reportes/excel/ordenes(periodo='mensual')}" class="btn btn-outline btn-sm"><i class="fa-solid fa-file-excel" style="color:#27ae60;"></i> Mensual</a>
+    </div>
+  </div>
+
+  <!-- Ventas tienda -->
+  <div class="card" style="padding:0;overflow:visible;">
+    <div style="background:#2980b9;padding:20px 24px;border-radius:var(--radius) var(--radius) 0 0;color:#fff;">
+      <i class="fa-solid fa-bag-shopping" style="font-size:28px;margin-bottom:8px;display:block;"></i>
+      <div style="font-size:16px;font-weight:700;">Ventas — Tienda</div>
+      <div style="font-size:12px;opacity:.8;margin-top:2px;">Reporte de productos vendidos</div>
+    </div>
+    <div style="padding:16px 24px;display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Exportar PDF</div>
+      <a th:href="@{/reportes/pdf/ventas(periodo='diario')}"   class="btn btn-outline btn-sm"><i class="fa-solid fa-file-pdf"></i> Diario</a>
+      <a th:href="@{/reportes/pdf/ventas(periodo='semanal')}"  class="btn btn-outline btn-sm"><i class="fa-solid fa-file-pdf"></i> Semanal</a>
+      <a th:href="@{/reportes/pdf/ventas(periodo='mensual')}"  class="btn btn-outline btn-sm"><i class="fa-solid fa-file-pdf"></i> Mensual</a>
+      <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:8px 0 4px;">Exportar Excel</div>
+      <a th:href="@{/reportes/excel/ventas(periodo='diario')}"  class="btn btn-outline btn-sm"><i class="fa-solid fa-file-excel" style="color:#27ae60;"></i> Diario</a>
+      <a th:href="@{/reportes/excel/ventas(periodo='semanal')}" class="btn btn-outline btn-sm"><i class="fa-solid fa-file-excel" style="color:#27ae60;"></i> Semanal</a>
+      <a th:href="@{/reportes/excel/ventas(periodo='mensual')}" class="btn btn-outline btn-sm"><i class="fa-solid fa-file-excel" style="color:#27ae60;"></i> Mensual</a>
+    </div>
+  </div>
+
+  <!-- Inventario -->
+  <div class="card" style="padding:0;overflow:visible;">
+    <div style="background:#8e44ad;padding:20px 24px;border-radius:var(--radius) var(--radius) 0 0;color:#fff;">
+      <i class="fa-solid fa-boxes-stacked" style="font-size:28px;margin-bottom:8px;display:block;"></i>
+      <div style="font-size:16px;font-weight:700;">Inventario</div>
+      <div style="font-size:12px;opacity:.8;margin-top:2px;">Estado actual de productos</div>
+    </div>
+    <div style="padding:16px 24px;display:flex;flex-direction:column;gap:8px;">
+      <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;">Exportar PDF</div>
+      <a th:href="@{/reportes/pdf/inventario}" class="btn btn-outline btn-sm"><i class="fa-solid fa-file-pdf"></i> Inventario Completo</a>
+      <div style="font-size:12px;font-weight:700;color:var(--text-muted);text-transform:uppercase;letter-spacing:1px;margin:8px 0 4px;">Exportar Excel</div>
+      <a th:href="@{/reportes/excel/inventario}" class="btn btn-outline btn-sm"><i class="fa-solid fa-file-excel" style="color:#27ae60;"></i> Inventario Completo</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Últimas órdenes -->
+<div class="card" style="margin-bottom:24px;">
+  <div class="card-header">
+    <div class="card-title"><div class="dot"></div>Últimas Órdenes de Servicio</div>
+    <a th:href="@{/ordenes}" class="card-action">Ver todas →</a>
+  </div>
+  <table>
+    <thead><tr><th>N° Orden</th><th>Placa</th><th>Servicio</th><th>Estado</th><th>Total</th><th>Fecha</th></tr></thead>
+    <tbody>
+      <tr th:each="o : ${ordenes}">
+        <td class="mono" th:text="${o.numeroOrden}"></td>
+        <td th:text="${o.vehiculo.placa}"></td>
+        <td th:text="${o.servicio.nombre}"></td>
+        <td><span th:classappend="${o.estado=='COMPLETADO'}?'pill-active':(${o.estado=='EN_PROCESO'}?'pill-info':'pill-low')"
+                  class="pill" th:text="${o.estado}"></span></td>
+        <td th:text="'S/ '+${#numbers.formatDecimal(o.total,1,'COMMA',2,'POINT')}"></td>
+        <td th:text="${#temporals.format(o.fechaInicio,'dd/MM/yyyy HH:mm')}"></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- Últimas ventas -->
+<div class="card">
+  <div class="card-header">
+    <div class="card-title"><div class="dot"></div>Últimas Ventas de Productos</div>
+    <a th:href="@{/ventas}" class="card-action">Ver todas →</a>
+  </div>
+  <table>
+    <thead><tr><th>Boleta</th><th>Producto</th><th>Cliente</th><th>Cantidad</th><th>Total</th><th>Fecha</th></tr></thead>
+    <tbody>
+      <tr th:each="v : ${ventas}">
+        <td class="mono" th:text="${v.numeroBoleta}"></td>
+        <td th:text="${v.producto.nombre}"></td>
+        <td th:text="${v.cliente}"></td>
+        <td th:text="${v.cantidad}"></td>
+        <td th:text="'S/ '+${#numbers.formatDecimal(v.total,1,'COMMA',2,'POINT')}"></td>
+        <td th:text="${#temporals.format(v.fecha,'dd/MM/yyyy HH:mm')}"></td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+</th:block>
+</body>
+</html>

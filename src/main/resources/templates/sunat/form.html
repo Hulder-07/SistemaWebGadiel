@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Emitir Comprobante</title></head>
+<body>
+<th:block layout:fragment="page-title">Emitir Comprobante SUNAT</th:block>
+<th:block layout:fragment="content">
+
+<div class="form-section" style="max-width:600px;">
+  <div class="form-section-title">
+    <i class="fa-solid fa-file-invoice" style="color:var(--accent)"></i>
+    Emitir Comprobante Electrónico
+  </div>
+
+  <form th:action="@{/sunat/emitir}" method="post">
+    <input type="hidden" name="origen"   th:value="${origen}"/>
+    <input type="hidden" name="origenId" th:value="${origenId}"/>
+    <input type="hidden" name="total"    th:value="${total}"/>
+
+    <div class="form-grid">
+      <div class="form-group span-2">
+        <label>Tipo de Comprobante *</label>
+        <select name="tipoComprobante" class="form-control" required onchange="toggleDoc(this.value)">
+          <option value="BOLETA">Boleta de Venta (B001)</option>
+          <option value="FACTURA">Factura (F001)</option>
+        </select>
+      </div>
+
+      <div class="form-group span-2">
+        <label>Nombre del Cliente / Razón Social *</label>
+        <input type="text" name="clienteNombre" class="form-control"
+               th:value="${clienteNombre}" required placeholder="Nombres y apellidos o Razón Social"/>
+      </div>
+
+      <div class="form-group span-2" id="divDocumento">
+        <label id="lblDocumento">DNI del Cliente *</label>
+        <input type="text" name="clienteDocumento" class="form-control"
+               id="inputDocumento" required placeholder="Ingrese el DNI (8 dígitos)"/>
+      </div>
+
+      <div class="form-group span-2">
+        <label>Descripción del Servicio/Producto</label>
+        <input type="text" name="descripcion" class="form-control"
+               th:value="${descripcion}" required/>
+      </div>
+
+      <div class="form-group span-2">
+        <label>Total (S/) incluye IGV 18%</label>
+        <input type="number" name="totalMostrar" class="form-control"
+               th:value="${total}" step="0.01" readonly style="background:#f9f9f9;"/>
+      </div>
+
+      <div class="form-group span-2" style="background:#fdf2f2;padding:12px;border-radius:8px;border:1px solid var(--border);">
+        <div style="font-size:12px;color:var(--text-muted);">
+          <div style="display:flex;justify-content:space-between;"><span>Op. Gravada:</span>
+            <strong th:text="'S/ '+${#numbers.formatDecimal(total/1.18,1,'COMMA',2,'POINT')}"></strong></div>
+          <div style="display:flex;justify-content:space-between;"><span>IGV (18%):</span>
+            <strong th:text="'S/ '+${#numbers.formatDecimal(total-(total/1.18),1,'COMMA',2,'POINT')}"></strong></div>
+          <div style="display:flex;justify-content:space-between;margin-top:4px;font-size:14px;">
+            <strong>TOTAL:</strong>
+            <strong style="color:var(--accent);" th:text="'S/ '+${#numbers.formatDecimal(total,1,'COMMA',2,'POINT')}"></strong>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="form-actions">
+      <a th:href="@{/ordenes}" class="btn btn-outline">Cancelar</a>
+      <button type="submit" class="btn btn-primary">
+        <i class="fa-solid fa-paper-plane"></i> Emitir a SUNAT
+      </button>
+    </div>
+  </form>
+</div>
+
+<script>
+function toggleDoc(tipo) {
+  var lbl = document.getElementById('lblDocumento');
+  var inp = document.getElementById('inputDocumento');
+  if (tipo === 'FACTURA') {
+    lbl.textContent = 'RUC del Cliente *';
+    inp.placeholder = 'Ingrese el RUC (11 dígitos)';
+    inp.maxLength = 11;
+  } else {
+    lbl.textContent = 'DNI del Cliente *';
+    inp.placeholder = 'Ingrese el DNI (8 dígitos)';
+    inp.maxLength = 8;
+  }
+}
+</script>
+</th:block>
+</body>
+</html>

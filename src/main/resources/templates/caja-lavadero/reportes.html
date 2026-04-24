@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Reportes - Caja Lavadero</title>
+    <style>
+        .filtros-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+            margin-bottom: 2rem;
+        }
+
+        .form-filtros {
+            display: grid;
+            grid-template-columns: 1fr 1fr auto;
+            gap: 1rem;
+            align-items: end;
+        }
+
+        .form-group {
+            margin-bottom: 0;
+        }
+
+        .form-label {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            display: block;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ced4da;
+            border-radius: 8px;
+            font-size: 1rem;
+        }
+
+        .resumen-general {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border-radius: 12px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+        }
+
+        .resumen-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-item .icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            opacity: 0.9;
+        }
+
+        .stat-item .label {
+            font-size: 0.875rem;
+            opacity: 0.9;
+            margin-bottom: 0.25rem;
+        }
+
+        .stat-item .value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+
+        .cajas-list {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        .caja-card {
+            border: 1px solid #dee2e6;
+            border-radius: 8px;
+            padding: 1.5rem;
+            margin-bottom: 1rem;
+            transition: all 0.3s;
+        }
+
+        .caja-card:hover {
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            transform: translateY(-2px);
+        }
+
+        .caja-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+        }
+
+        .caja-fecha {
+            font-size: 1.25rem;
+            font-weight: bold;
+            color: #212529;
+        }
+
+        .caja-total {
+            font-size: 1.75rem;
+            font-weight: bold;
+            color: #28a745;
+        }
+
+        .caja-detalles {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .detalle-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detalle-icon {
+            font-size: 1.5rem;
+        }
+
+        .detalle-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .detalle-label {
+            font-size: 0.75rem;
+            color: #6c757d;
+        }
+
+        .detalle-value {
+            font-weight: 600;
+            color: #212529;
+        }
+
+        .caja-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: #6c757d;
+        }
+
+        .empty-state i {
+            font-size: 4rem;
+            margin-bottom: 1rem;
+            opacity: 0.3;
+        }
+
+        .badge-diferencia {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 20px;
+            font-size: 0.875rem;
+            font-weight: 500;
+        }
+
+        .badge-sobrante {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .badge-faltante {
+            background: #f8d7da;
+            color: #721c24;
+        }
+
+        .badge-exacto {
+            background: #cce5ff;
+            color: #004085;
+        }
+
+        /* ── HISTORIAL SECTION ───────────────────────────────── */
+        .historial-grid {
+          display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+          gap: 12px; margin-top: 12px;
+        }
+        .hist-card {
+          background: var(--bg-card, white); border: 1px solid var(--border, #dee2e6);
+          border-radius: var(--radius, 8px); padding: 16px 18px;
+          display: flex; justify-content: space-between; align-items: center; gap: 12px;
+          transition: box-shadow var(--transition, 0.3s);
+        }
+        .hist-card:hover { box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        .hist-date { font-family: var(--font-display, inherit); font-weight: 700; font-size: 14px; }
+        .hist-meta { font-size: 11.5px; color: var(--text-3, #6c757d); margin-top: 3px; }
+        .hist-total { font-family: var(--font-display, inherit); font-size: 18px; font-weight: 800; color: var(--green, #28a745); }
+    </style>
+</head>
+<body>
+<div layout:fragment="content">
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h2>📊 Reportes de Caja</h2>
+                <p class="text-muted mb-0">Consulta de cajas cerradas por rango de fechas</p>
+            </div>
+            <a th:href="@{/caja-lavadero}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Volver
+            </a>
+        </div>
+
+        <!-- Filtros -->
+        <div class="filtros-card">
+            <h5 class="mb-3"><i class="fas fa-filter"></i> Filtrar por Fecha</h5>
+            <form th:action="@{/caja-lavadero/reportes}" method="get" class="form-filtros">
+                <div class="form-group">
+                    <label class="form-label" for="fechaInicio">Fecha Inicio</label>
+                    <input type="date" 
+                           class="form-control" 
+                           id="fechaInicio" 
+                           name="fechaInicio"
+                           th:value="${fechaInicio}"
+                           required>
+                </div>
+
+                <div class="form-group">
+                    <label class="form-label" for="fechaFin">Fecha Fin</label>
+                    <input type="date" 
+                           class="form-control" 
+                           id="fechaFin" 
+                           name="fechaFin"
+                           th:value="${fechaFin}"
+                           required>
+                </div>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="fas fa-search"></i> Buscar
+                </button>
+            </form>
+        </div>
+
+        <!-- Resumen general del período -->
+        <div th:if="${cajas != null and !cajas.empty}" class="resumen-general">
+            <h3><i class="fas fa-chart-line"></i> Resumen del Período</h3>
+            <p class="mb-0">
+                Del <strong th:text="${fechaInicio}"></strong> al <strong th:text="${fechaFin}"></strong>
+            </p>
+
+            <div class="resumen-stats">
+                <div class="stat-item">
+                    <div class="icon">📅</div>
+                    <div class="label">Días con Caja</div>
+                    <div class="value" th:text="${cajas.size()}">0</div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="icon">🚗</div>
+                    <div class="label">Total Vehículos</div>
+                    <div class="value" th:text="${#aggregates.sum(cajas.![cantidadVehiculos])}">0</div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="icon">💰</div>
+                    <div class="label">Total Recaudado</div>
+                    <div class="value">S/ <span th:text="${#numbers.formatDecimal(totalPeriodo, 1, 2)}">0.00</span></div>
+                </div>
+
+                <div class="stat-item">
+                    <div class="icon">📊</div>
+                    <div class="label">Promedio por Día</div>
+                    <div class="value">S/ <span th:text="${#numbers.formatDecimal(totalPeriodo / cajas.size(), 1, 2)}">0.00</span></div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Lista de cajas -->
+        <div class="cajas-list">
+            <h4 class="mb-3">
+                <i class="fas fa-list"></i> Detalle de Cajas Cerradas
+                <span th:if="${cajas != null}" class="badge bg-primary" th:text="${cajas.size()}">0</span>
+            </h4>
+
+            <!-- Sin resultados -->
+            <div th:if="${cajas == null or cajas.empty}" class="empty-state">
+                <i class="fas fa-inbox"></i>
+                <p>No hay cajas cerradas en el rango seleccionado</p>
+                <small class="text-muted">Seleccione un rango de fechas y haga clic en Buscar</small>
+            </div>
+
+            <!-- Listado de cajas -->
+            <div th:if="${cajas != null and !cajas.empty}">
+                <div class="historial-grid">
+                    <div th:each="caja : ${cajas}" class="hist-card">
+                      <div>
+                        <div class="hist-date" th:text="${#temporals.format(caja.fechaCierre,'dd/MM/yyyy')}">19/03/2026</div>
+                        <div class="hist-meta">
+                          <i class="fa-solid fa-user" style="font-size:10px;"></i>
+                          <span th:text="${caja.responsable.nombre}">Usuario</span> ·
+                          <i class="fa-solid fa-car" style="font-size:10px;"></i>
+                          <span th:text="${caja.cantidadVehiculos}">0</span> veh.
+                          <span th:if="${caja.diferencia != 0}" style="color:#d97706;margin-left:4px;">
+                            ⚠ Dif: S/<span th:text="${#numbers.formatDecimal(caja.diferencia,1,'COMMA',2,'POINT')}">0</span>
+                          </span>
+                        </div>
+                      </div>
+                      <div style="text-align:right;">
+                        <div class="hist-total">S/ <span th:text="${#numbers.formatDecimal(caja.totalDia,1,'COMMA',2,'POINT')}">0.00</span></div>
+                        <div style="display:flex;gap:4px;margin-top:8px;justify-content:flex-end;">
+                          <a th:href="@{/caja-lavadero/exportar/{id}(id=${caja.id})}" class="btn btn-sm btn-outline-success">
+                            <i class="fa-solid fa-file-excel"></i> Excel
+                          </a>
+                          <a th:href="@{/caja-lavadero/detalle/{id}(id=${caja.id})}" class="btn btn-sm btn-outline-info">
+                            <i class="fa-solid fa-eye"></i> Detalle
+                          </a>
+                        </div>
+                      </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Auto-completar fechas por defecto (último mes)
+        window.addEventListener('DOMContentLoaded', function() {
+            const fechaInicio = document.getElementById('fechaInicio');
+            const fechaFin = document.getElementById('fechaFin');
+
+            if (!fechaInicio.value) {
+                const hoy = new Date();
+                const haceUnMes = new Date(hoy.getFullYear(), hoy.getMonth() - 1, hoy.getDate());
+                
+                fechaInicio.value = haceUnMes.toISOString().split('T')[0];
+                fechaFin.value = hoy.toISOString().split('T')[0];
+            }
+        });
+    </script>
+</div>
+</body>
+</html>

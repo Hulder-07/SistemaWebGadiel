@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head>
+    <title>Accesibilidad - Configuración</title>
+</head>
+<body>
+<th:block layout:fragment="page-title">Accesibilidad</th:block>
+<th:block layout:fragment="content">
+
+<div style="max-width: 800px; margin: 0 auto;">
+    
+    <!-- Breadcrumb -->
+    <nav style="margin-bottom: 2rem;">
+        <a th:href="@{/configuracion}" style="color: #6b7280; text-decoration: none;">
+            <i class="fas fa-arrow-left"></i> Configuración
+        </a>
+        <span style="color: #6b7280; margin: 0 0.5rem;">/</span>
+        <span>Accesibilidad</span>
+    </nav>
+
+    <div class="card">
+        <div class="card-header">
+            <div class="card-title">
+                <div class="dot"></div>
+                <span>Opciones de Accesibilidad</span>
+            </div>
+        </div>
+        
+        <div style="padding: 2rem;">
+            
+            <p style="color: #6b7280; margin-bottom: 2rem;">
+                Ajusta la visualización del sistema para mejorar la legibilidad y accesibilidad.
+            </p>
+
+            <!-- Tamaño de Texto -->
+            <div class="form-group">
+                <label class="form-label">📏 Tamaño de Texto</label>
+                <div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 1rem;">
+                    
+                    <label class="size-card">
+                        <input type="radio" name="fontSize" value="xs" id="size-xs">
+                        <div>
+                            <span style="font-size: 0.75rem;">Muy Pequeño</span>
+                        </div>
+                    </label>
+
+                    <label class="size-card">
+                        <input type="radio" name="fontSize" value="sm" id="size-sm">
+                        <div>
+                            <span style="font-size: 0.875rem;">Pequeño</span>
+                        </div>
+                    </label>
+
+                    <label class="size-card">
+                        <input type="radio" name="fontSize" value="md" id="size-md" checked>
+                        <div>
+                            <span style="font-size: 1rem;">Mediano</span>
+                        </div>
+                    </label>
+
+                    <label class="size-card">
+                        <input type="radio" name="fontSize" value="lg" id="size-lg">
+                        <div>
+                            <span style="font-size: 1.125rem;">Grande</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Contraste -->
+            <div class="form-group">
+                <label class="form-label">🎨 Contraste</label>
+                <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 1rem;">
+                    
+                    <label class="contrast-card">
+                        <input type="radio" name="contrast" value="normal" id="contrast-normal" checked>
+                        <div style="background: white; color: #111;">
+                            <i class="fas fa-adjust"></i>
+                            <span>Normal</span>
+                        </div>
+                    </label>
+
+                    <label class="contrast-card">
+                        <input type="radio" name="contrast" value="alto" id="contrast-alto">
+                        <div style="background: #000; color: #fff;">
+                            <i class="fas fa-adjust"></i>
+                            <span>Alto Contraste</span>
+                        </div>
+                    </label>
+
+                    <label class="contrast-card">
+                        <input type="radio" name="contrast" value="invertido" id="contrast-invertido">
+                        <div style="background: #fff; color: #000; border: 2px solid #000;">
+                            <i class="fas fa-adjust"></i>
+                            <span>Invertido</span>
+                        </div>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Opciones Adicionales -->
+            <div class="form-group">
+                <label class="form-label">⚙️ Opciones Adicionales</label>
+                <div style="display: flex; flex-direction: column; gap: 1rem;">
+                    
+                    <label class="toggle-option">
+                        <div>
+                            <strong>Reducir Animaciones</strong>
+                            <p>Desactiva transiciones y efectos visuales</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+
+                    <label class="toggle-option">
+                        <div>
+                            <strong>Subrayar Enlaces</strong>
+                            <p>Muestra todos los enlaces subrayados</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+
+                    <label class="toggle-option">
+                        <div>
+                            <strong>Cursor Grande</strong>
+                            <p>Aumenta el tamaño del cursor del mouse</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+
+                    <label class="toggle-option">
+                        <div>
+                            <strong>Lector de Pantalla</strong>
+                            <p>Optimiza la interfaz para lectores de pantalla</p>
+                        </div>
+                        <label class="switch">
+                            <input type="checkbox">
+                            <span class="slider"></span>
+                        </label>
+                    </label>
+                </div>
+            </div>
+
+            <!-- Vista Previa -->
+            <div style="background: #f9fafb; padding: 1.5rem; border-radius: 12px; margin-top: 2rem;">
+                <h4 style="margin: 0 0 1rem;">Vista Previa</h4>
+                <div id="preview" style="background: white; padding: 1.5rem; border-radius: 8px; border: 2px solid #e5e7eb;">
+                    <h3 style="margin: 0 0 0.5rem;">Título de Ejemplo</h3>
+                    <p style="margin: 0; color: #6b7280;">
+                        Este es un texto de ejemplo para visualizar cómo se verá el sistema con la configuración seleccionada.
+                    </p>
+                    <a href="#" style="display: inline-block; margin-top: 0.5rem; color: #dc2626;">
+                        Enlace de ejemplo
+                    </a>
+                </div>
+            </div>
+
+            <!-- Botones -->
+            <div style="display: flex; gap: 1rem; margin-top: 2rem;">
+                <button type="button" class="btn btn-primary" onclick="guardarAccesibilidad()">
+                    <i class="fas fa-save"></i> Guardar Cambios
+                </button>
+                <button type="button" class="btn btn-outline" onclick="resetearAccesibilidad()">
+                    <i class="fas fa-undo"></i> Restablecer
+                </button>
+                <a th:href="@{/configuracion}" class="btn btn-outline">
+                    Cancelar
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<style>
+.size-card, .contrast-card {
+    cursor: pointer;
+}
+
+.size-card input, .contrast-card input {
+    display: none;
+}
+
+.size-card > div, .contrast-card > div {
+    padding: 1rem;
+    border: 2px solid #e5e7eb;
+    border-radius: 8px;
+    text-align: center;
+    transition: all 0.2s;
+}
+
+.size-card input:checked + div,
+.contrast-card input:checked + div {
+    border-color: #dc2626;
+    background: #fef2f2 !important;
+}
+
+.contrast-card > div {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.contrast-card i {
+    font-size: 1.5rem;
+}
+
+.toggle-option {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 1rem;
+    background: #f9fafb;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+.toggle-option:hover {
+    background: #f3f4f6;
+}
+
+.toggle-option strong {
+    display: block;
+    margin-bottom: 0.25rem;
+}
+
+.toggle-option p {
+    margin: 0;
+    font-size: 0.875rem;
+    color: #6b7280;
+}
+
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 50px;
+    height: 24px;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    cursor: pointer;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background-color: #ccc;
+    transition: .4s;
+    border-radius: 24px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 18px;
+    width: 18px;
+    left: 3px;
+    bottom: 3px;
+    background-color: white;
+    transition: .4s;
+    border-radius: 50%;
+}
+
+input:checked + .slider {
+    background-color: #10b981;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+</style>
+
+<script>
+function actualizarPreview() {
+    const preview = document.getElementById('preview');
+    const fontSize = document.querySelector('input[name="fontSize"]:checked')?.value || 'md';
+    const contrast = document.querySelector('input[name="contrast"]:checked')?.value || 'normal';
+    
+    // Tamaño de texto
+    const sizes = { xs: '0.75rem', sm: '0.875rem', md: '1rem', lg: '1.125rem' };
+    preview.style.fontSize = sizes[fontSize];
+    
+    // Contraste
+    if (contrast === 'alto') {
+        preview.style.background = '#000';
+        preview.style.color = '#fff';
+    } else if (contrast === 'invertido') {
+        preview.style.background = '#fff';
+        preview.style.color = '#000';
+        preview.style.border = '2px solid #000';
+    } else {
+        preview.style.background = 'white';
+        preview.style.color = '#111';
+        preview.style.border = '2px solid #e5e7eb';
+    }
+}
+
+document.querySelectorAll('input[name="fontSize"], input[name="contrast"]').forEach(input => {
+    input.addEventListener('change', actualizarPreview);
+});
+
+function guardarAccesibilidad() {
+    alert('✅ Configuración de accesibilidad guardada correctamente');
+    // TODO: Enviar al backend
+}
+
+function resetearAccesibilidad() {
+    document.getElementById('size-md').checked = true;
+    document.getElementById('contrast-normal').checked = true;
+    document.querySelectorAll('.toggle-option input[type="checkbox"]').forEach(cb => cb.checked = false);
+    actualizarPreview();
+}
+</script>
+
+</th:block>
+</body>
+</html>

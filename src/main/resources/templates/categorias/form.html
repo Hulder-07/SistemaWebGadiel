@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="es" xmlns:th="http://www.thymeleaf.org"
+      xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      layout:decorate="~{layout/base}">
+<head><title>Categoría</title></head>
+<body>
+<div layout:fragment="page-title"
+     th:text="${categoria.id == null ? 'Nueva Categoría' : 'Editar Categoría'}">Categoría</div>
+<div layout:fragment="content">
+
+<div style="max-width:560px;">
+  <div class="card">
+    <div class="card-header">
+      <div class="card-title">
+        <div class="dot"></div>
+        <span th:text="${categoria.id == null ? 'Crear categoría' : 'Editar categoría'}"></span>
+      </div>
+    </div>
+    <div style="padding:24px;">
+
+      <div th:if="${error}" class="alert-box danger" style="margin-bottom:16px;">
+        <i class="fa-solid fa-circle-exclamation"></i> <span th:text="${error}"></span>
+      </div>
+
+      <form th:action="@{/categorias/guardar}" th:object="${categoria}" method="post">
+        <input type="hidden" th:field="*{id}"/>
+
+        <!-- Nombre -->
+        <div class="form-group" style="margin-bottom:16px;">
+          <label style="font-size:13px;font-weight:700;color:var(--text-secondary);">Nombre *</label>
+          <input class="form-control" type="text" th:field="*{nombre}"
+                 placeholder="Ej: Silicona, Shampoo, Cera..." required/>
+        </div>
+
+        <!-- Descripción -->
+        <div class="form-group" style="margin-bottom:16px;">
+          <label style="font-size:13px;font-weight:700;color:var(--text-secondary);">Descripción</label>
+          <textarea class="form-control" th:field="*{descripcion}"
+                    rows="2" placeholder="Descripción opcional de la categoría"></textarea>
+        </div>
+
+        <!-- Selector de ícono -->
+        <div class="form-group" style="margin-bottom:16px;">
+          <label style="font-size:13px;font-weight:700;color:var(--text-secondary);">Ícono</label>
+          <input type="hidden" th:field="*{icono}" id="iconoInput"/>
+          <div class="icono-grid" id="iconoGrid">
+            <div th:each="ic : ${iconos}"
+                 class="icono-opt"
+                 th:attr="data-val=${ic[0]}"
+                 th:classappend="${categoria.icono == ic[0]} ? ' selected' : ''"
+                 th:title="${ic[1]}"
+                 onclick="selIcono(this)">
+              <i th:class="${ic[0]}"></i>
+              <span th:text="${ic[1]}"></span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Selector de color -->
+        <div class="form-group" style="margin-bottom:20px;">
+          <label style="font-size:13px;font-weight:700;color:var(--text-secondary);">Color</label>
+          <input type="hidden" th:field="*{color}" id="colorInput"/>
+          <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:8px;">
+            <div th:each="col : ${colores}"
+                 class="color-opt"
+                 th:attr="data-val=${col[0]}"
+                 th:style="'background:'+${col[0]}+';'"
+                 th:classappend="${categoria.color == col[0]} ? ' selected' : ''"
+                 th:title="${col[1]}"
+                 onclick="selColor(this)">
+            </div>
+          </div>
+        </div>
+
+        <!-- Preview -->
+        <div style="margin-bottom:20px;padding:16px;background:var(--bg-main);border-radius:12px;border:1px solid var(--border);">
+          <div style="font-size:11px;color:var(--text-muted);margin-bottom:10px;font-weight:700;text-transform:uppercase;letter-spacing:.8px;">Vista previa</div>
+          <div style="display:flex;align-items:center;gap:14px;">
+            <div id="previewIcon"
+                 style="width:52px;height:52px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;background:#f0f0f0;color:#c0392b;flex-shrink:0;">
+              <i class="fa-solid fa-box" id="previewIconElement"></i>
+            </div>
+            <div>
+              <div id="previewNombre" style="font-size:15px;font-weight:700;color:var(--text-primary);">Nombre categoría</div>
+              <div id="previewDesc" style="font-size:12px;color:var(--text-muted);margin-top:2px;">Descripción</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Botones -->
+        <div style="display:flex;gap:10px;">
+          <button type="submit" class="btn btn-primary">
+            <i class="fa-solid fa-floppy-disk"></i> Guardar
+          </button>
+          <a th:href="@{/categorias}" class="btn btn-outline">Cancelar</a>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<style>
+.icono-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(80px,1fr));gap:8px;margin-top:8px;}
+.icono-opt{display:flex;flex-direction:column;align-items:center;gap:4px;padding:10px 6px;border:1.5px solid var(--border);border-radius:10px;cursor:pointer;transition:all .15s;background:var(--bg-card);font-size:18px;color:var(--text-secondary);}
+.icono-opt span{font-size:9px;text-align:center;color:var(--text-muted);}
+.icono-opt:hover{border-color:var(--accent);color:var(--accent);}
+.icono-opt.selected{border-color:var(--accent);background:var(--accent);color:#fff;}
+.icono-opt.selected span{color:rgba(255,255,255,.8);}
+.color-opt{width:32px;height:32px;border-radius:50%;cursor:pointer;transition:transform .15s;border:3px solid transparent;}
+.color-opt:hover{transform:scale(1.15);}
+.color-opt.selected{border:3px solid var(--text-primary);transform:scale(1.15);}
+</style>
+
+</div>
+<th:block layout:fragment="scripts">
+<script>
+function selIcono(el) {
+  const val = el.dataset.val;
+  document.getElementById('iconoInput').value = val;
+  document.querySelectorAll('.icono-opt').forEach(o => o.classList.toggle('selected', o.dataset.val === val));
+  actualizarPreview();
+}
+
+function selColor(el) {
+  const val = el.dataset.val;
+  document.getElementById('colorInput').value = val;
+  document.querySelectorAll('.color-opt').forEach(o => o.classList.toggle('selected', o.dataset.val === val));
+  actualizarPreview();
+}
+
+function actualizarPreview() {
+  const icono  = document.getElementById('iconoInput').value;
+  const color  = document.getElementById('colorInput').value || '#c0392b';
+  const nombre = document.querySelector('[name="nombre"]').value || 'Nombre categoría';
+  const desc   = document.querySelector('[name="descripcion"]').value || 'Descripción';
+  const prev   = document.getElementById('previewIcon');
+  const prevIconElement = document.getElementById('previewIconElement');
+  
+  prev.style.background = color + '22';
+  prev.style.color = color;
+  
+  if (icono) {
+    prevIconElement.className = icono;
+  } else {
+    prevIconElement.className = 'fa-solid fa-box';
+  }
+  
+  document.getElementById('previewNombre').textContent = nombre;
+  document.getElementById('previewDesc').textContent = desc;
+}
+
+document.querySelector('[name="nombre"]').addEventListener('input', actualizarPreview);
+document.querySelector('[name="descripcion"]').addEventListener('input', actualizarPreview);
+
+window.addEventListener('DOMContentLoaded', function() {
+  const iv = document.getElementById('iconoInput').value;
+  const cv = document.getElementById('colorInput').value;
+  
+  if (iv) {
+    document.querySelectorAll('.icono-opt').forEach(o => o.classList.toggle('selected', o.dataset.val === iv));
+  }
+  if (cv) {
+    document.querySelectorAll('.color-opt').forEach(o => o.classList.toggle('selected', o.dataset.val === cv));
+  }
+  
+  actualizarPreview();
+});
+</script>
+</th:block>
+</body>
+</html>
